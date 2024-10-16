@@ -1,0 +1,42 @@
+FaskAPI_UCI_Repo_Proyects/
+│                                # Directorio principal de la aplicación
+├── __init__.py                   
+├── main.py                       
+│
+├── config/                         # Configuraciones de la aplicación
+│   ├── __init__.py              
+│   ├── database_config.py
+│   ├── dot_env_config.py         
+│   └── server_config.py 
+│
+├── data/                           # Capa de Repositorio (Maneja la consultas a la base de datos)
+│   ├── __init__.py              
+│   └── user_data_base.py
+│            
+│
+├── models/                         # Tiene todas los modelos de datos
+│   ├── __init__.py              
+│   └── all_model.py          
+│
+├── presentation/                   # Capa de presentación (rutas, controladores)           
+│   ├── routes/                   
+│   │   ├── __init__.py    
+│   │   ├── audits_routes.py 
+│   │   ├── parameters_routes.py
+│   │   ├── projects_routes.py
+│   │   ├── session_routes.py
+│   │   └── user_routes.py  
+│   │
+│   └── __init__.py
+│
+├── services/                       # Capa de lógica de negocio (servicios)
+│   ├── __init__.py              
+│   └── session_service.py
+│
+├── static/                         # Archivos estáticos (CSS, JS, imágenes)
+│
+├── templates/                      # Plantillas HTML (Jinja2)
+│
+└── util/    
+    ├── __init__.py              
+    └── jwt_functions.py
