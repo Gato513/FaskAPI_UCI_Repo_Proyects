@@ -603,12 +603,21 @@
 						<form class="d-flex align-items-center justify-content-around flex-wrap gap-2 gap-sm-2 "
 							style="min-height: 3.5rem;" role="form" method="post" action="/dashboard/parameters/subject">
 
-							<div class="d-flex align-items-center gap-4 w-100 w-md-45 w-lg-60">
+							<div class="d-flex align-items-center gap-4 w-100 w-md-45 w-lg-45">
 								<input type="text" class="form-control" name="subjects_name" placeholder="Nombre de la Materia" aria-label="Subjects"
 									aria-describedby="subjects-addon">
 							</div>
 
-							<div class="d-flex justify-content-between gap-sm-6 text-center w-100 w-md-50 w-lg-35 ">
+							<div class="d-flex justify-content-between gap-sm-6 text-center w-100 w-md-50 w-lg-50 ">
+
+								<select class="form-select cursor-pointer" aria-label="Default select example" name="id_faculty">
+									<option selected>Seleccionar Facultad</option>
+								
+									{% for faculty in faculties %}
+									<option value={{faculty.id_facultad}}>{{faculty.nombre_facultad}}</option>
+									{% endfor %}
+								
+								</select>
 
 								<select class="form-select cursor-pointer" aria-label="Default select example"
 									name="id_course">
@@ -620,7 +629,7 @@
 
 								</select>
 
-								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-sm-40 w-md-50 w-lg-40">
+								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-sm-40 w-md-50 w-lg-60">
 									Crear materia
 								</button>
 

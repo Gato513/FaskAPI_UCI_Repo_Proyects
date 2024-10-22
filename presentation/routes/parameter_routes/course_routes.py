@@ -3,8 +3,8 @@ from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
 
-from services.course_service import  get_all_courses, create_new_course, delete_course_by_id
-from services.career_service  import  get_all_careers
+from services.parameter_service.course_service import  get_all_courses, create_new_course, delete_course_by_id
+from services.parameter_service.career_service  import  get_all_careers
 
 from config.database_config import get_db
 

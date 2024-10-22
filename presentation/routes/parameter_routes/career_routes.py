@@ -2,8 +2,8 @@ from fastapi import Request, Form, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from config.server_config import router, templates
-from services.career_service  import  get_all_careers, create_new_career, delete_career_by_id
-from services.faculty_service import  get_all_faculties
+from services.parameter_service.career_service  import  get_all_careers, create_new_career, delete_career_by_id
+from services.parameter_service.faculty_service import  get_all_faculties
 from config.database_config import get_db
 
 #? Renderizar Materias y Cursos

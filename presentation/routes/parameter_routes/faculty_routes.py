@@ -2,7 +2,7 @@ from fastapi import Request, Form, Depends, HTTPException, status
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
-from services.faculty_service import create_new_faculty, get_all_faculties, delete_faculty_by_id
+from services.parameter_service.faculty_service import create_new_faculty, get_all_faculties, delete_faculty_by_id
 from config.database_config import get_db
 
 #? Renderizar Facultades
