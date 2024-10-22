@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 # Función para obtener el usuario por email
 def user_by_email(db: Session, email: str):
     try:
-        user_data = db.query(Usuario).filter(Usuario.useremail == email).first()
+        user_data = db.query(Usuario).filter(Usuario.user_email == email).first()
         return user_data
     
     except SQLAlchemyError as e:

@@ -28,4 +28,4 @@ async def user_login(response: Response, request: Request, email: str = Form(...
         return RedirectResponse(url="/dashboard/projects/show_project", status_code=303, headers=response.headers)
 
     except HTTPException as e:
-        return templates.TemplateResponse("login.html", {"request": request, "error": str(e)[4:]})  # Manejo de errores generales
+        return templates.TemplateResponse("login.html", {"request": request, "error": e.detail})  # Manejo de errores generales

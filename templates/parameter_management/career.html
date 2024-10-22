@@ -21,7 +21,7 @@
 	<link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
 	<link rel="icon" type="image/png" href="/static/img/favicon.png">
 	<title>
-		Gestion de Facultades
+		Gestion de Cursos
 	</title>
 	<!--     Fonts and icons     -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -39,38 +39,6 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-
-	<!-- Modal -->
-	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-		aria-labelledby="staticBackdropLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<form role="form" method="post" action="/dashboard/parameters/faculty">
-
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar la Facultad</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-
-					<div class="modal-body">
-
-						<div class="d-flex align-items-center gap-4 w-100">
-							<input type="text" class="form-control" name="facutie_name"
-								placeholder="Nombre de la Facultad" aria-label="Facultad"
-								aria-describedby="create_faculty">
-						</div>
-
-					</div>
-					<div class="modal-footer w-100 justify-content-between">
-						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-45">Editar Facultad</button>
-					</div>
-
-				</form>
-			</div>
-		</div>
-	</div>
-
 	<!-- Acordeon de Barra Lateral -->
 	<aside
 		class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white"
@@ -99,7 +67,7 @@
 						<ul class="navbar-nav">
 
 							<li class="nav-item">
-								<a class="nav-link" href="/dashboard/projects/show_project">
+								<a class="nav-link " href="/dashboard/projects/show_project">
 									<div
 										class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
 										<svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1"
@@ -248,7 +216,7 @@
 						<ul class="navbar-nav">
 
 							<li class="nav-item">
-								<a class="nav-link  active" href="/dashboard/parameters/faculty">
+								<a class="nav-link  " href="/dashboard/parameters/faculty">
 									<div
 										class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
 										<svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1"
@@ -280,7 +248,7 @@
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link  " href="/dashboard/parameters/career">
+								<a class="nav-link  active" href="/dashboard/parameters/career">
 									<div
 										class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
 										<svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1"
@@ -594,7 +562,7 @@
 			navbar-scroll="true">
 			<div class="container-fluid py-1 px-3">
 				<nav aria-label="breadcrumb">
-					<h5 class="font-weight-bolder mb-0">Facultades</h5>
+					<h5 class="font-weight-bolder mb-0">Carreras</h5>
 				</nav>
 				<div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
 					<div class="ms-md-auto pe-md-3 d-flex align-items-center">
@@ -631,21 +599,35 @@
 			<div class="row my-4">
 				<div class="col-lg-12 mb-md-0 mb-4">
 					<div class="card p-3">
+
 						<form class="d-flex align-items-center justify-content-around flex-wrap gap-2 gap-sm-2 "
-							style="min-height: 3.5rem;" role="form" method="post"
-							action="/dashboard/parameters/faculty">
+							style="min-height: 3.5rem;" role="form" method="post" action="/dashboard/parameters/career">
 
 							<div class="d-flex align-items-center gap-4 w-100 w-md-45 w-lg-60">
-
-								<input type="text" class="form-control" name="facutie_name"
-									placeholder="Nombre de la Facultad" aria-label="Facultad"
-									aria-describedby="create_faculty">
+								<input type="text" class="form-control" name="career_name"
+									placeholder="Nombre de la Carrera" aria-label="Career"
+									aria-describedby="career-addon">
 							</div>
 
-							<div class="d-flex justify-content-sm-end gap-sm-6 text-center w-100 w-md-50 w-lg-35 ">
-								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-100 w-sm-50 w-lg-50">Crear
-									Facultad</button>
+							<div class="d-flex justify-content-between gap-sm-6 text-center w-100 w-md-50 w-lg-35 ">
+
+								<!-- Trabajando -->
+
+								<select class="form-select cursor-pointer" aria-label="Default select example" name="facutie_id">
+									<option selected>Seleccionar Facultad</option>
+
+									{% for faculty in faculties %}
+									<option value={{faculty.id_facultad}} >{{faculty.nombre_facultad}}</option>
+									{% endfor %}
+
+								</select>
+
+								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-sm-40 w-md-50 w-lg-40">
+									Crear Carrera
+								</button>
+
 							</div>
+
 						</form>
 
 						{% if error %}
@@ -671,17 +653,23 @@
 									<thead>
 										<tr>
 											<th
-												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-50">
-												Facultades
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-30">
+												Carreras
 											</th>
+
 											<th
-												class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 p-4 w-50">
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-30">
+												Facultad de la carrera
+											</th>
+
+											<th
+												class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 p-4 w-30">
 												Opciones
 											</th>
 									</thead>
 
 									<tbody>
-										{% for faculty in faculties %}
+										{% for career in careers %}
 										<tr>
 											<td>
 												<div class="d-flex px-2 py-1">
@@ -690,31 +678,38 @@
 															class="avatar avatar-sm me-3" alt="xd">
 													</div>
 													<div class="d-flex flex-column justify-content-center">
-														<h6 class="mb-0 text-sm">{{faculty.nombre_facultad}}</h6>
+														<h6 class="mb-0 text-sm">{{career.nombre_carrera}}</h6>
+													</div>
+												</div>
+											</td>
+
+											<td>
+												<div class="d-flex px-2 py-1">
+													<div class="d-flex flex-column justify-content-center">
+														<h6 class="mb-0 text-sm">{{career.facultad.nombre_facultad}}
+														</h6>
 													</div>
 												</div>
 											</td>
 
 											<td class="align-middle">
-												<!-- Trabajando -->
 												<div class="d-flex gap-3">
-
-													<button type="button" class="btn bg-gradient-faded-success mb-0 px-2 w-60 w-sm-50 w-lg-50" data-bs-toggle="modal"
-														data-bs-target="#staticBackdrop" data-id="{{ faculty.id_facultad }}">
+													<button type="submit"
+														class="btn bg-gradient-faded-success mb-0 px-2 w-60 w-sm-50 w-lg-50">
 														Editar
 													</button>
 
-													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50"
-														href="/dashboard/parameters/delete/faculty/{{ faculty.id_facultad }}">
-														<button type="button"
-															class="btn bg-gradient-warning mb-0 w-100">
+													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50" href="/dashboard/parameters/delete/career/{{ career.id_carrera }}">
+														<button type="button" class="btn bg-gradient-warning mb-0 w-100 ">
 															Eliminar
 														</button>
 													</a>
+
 												</div>
 											</td>
 										</tr>
 										{% endfor %}
+										<!-- Trabajando -->
 
 									</tbody>
 
@@ -727,7 +722,6 @@
 			</div>
 
 		</div>
-
 	</main>
 
 	<div class="fixed-plugin">
@@ -767,7 +761,9 @@
 	<script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/chartjs.min.js"></script>
-	<script src="/static/js/custom/handle-deleting-parameters.js"></script>
+	<script type="module" src="/static/js/core/bootstrap.bundle.min.js"></script>
+
+
 
 	<script>
 		var win = navigator.platform.indexOf('Win') > -1;
