@@ -9,9 +9,15 @@ def get_all(db: Session):
     try:
         courses_data = db.query(Curso).all()
         return courses_data
-    
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+
+#* Función para obtener todos los cursos filtrados por id de la facultad:
+def courses_by_faculty(db: Session, faculty_id: str):
+    try:
+        response = db.query(Curso).filter(Curso.carrera.has(id_facultad=faculty_id)).all()
+        return response
+    except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
 #* Función para obtener una curso por id:
@@ -54,3 +60,12 @@ def delete_by_id(course, db: Session):
     except SQLAlchemyError as e:
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+
+#? Actulizar Curso:
+def update_course_by_id(course, course_name: str, career_id: str, db: Session): 
+    try:
+        course.nombre_curso = course_name
+        course.id_carrera = career_id
+        db.commit()
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos") 

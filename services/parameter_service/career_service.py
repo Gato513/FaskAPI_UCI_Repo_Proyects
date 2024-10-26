@@ -1,31 +1,52 @@
-from data.career_data_base import create_career, get_all, career_by_id, delete_by_id
+from data.career_data_base import create_career, get_all, career_by_id, career_by_name, delete_by_id, update_career_by_id
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+
+def career_validation(career_name: str, db: Session):
+    career_exist = career_by_name(db, career_name) #! Verificar si la facultad ya existe en la base de datos
+
+    # Si existe, lanzar una excepción con código 409 (conflicto)
+    if career_exist:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="La carrera ya existe")
+    
+    return career_exist
 
 #? Octener todas las carreras de la base de datos:
 async def get_all_careers(db: Session): 
     return get_all(db)
 
 #? Crear Nueva Carrera:
-async def create_new_career(new_career: str, facutie_id: int, db: Session) -> str:
-    # Verificar si la nombre de la Carrera está vacío
-    if not new_career:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Agregue un nombre de Carrera")
+async def create_new_career(new_career: str, facutie_id: str, db: Session) -> str:
 
-    # Crear la nuevo Carrera
+    if not new_career or facutie_id == "Facultades":            # Verificar si el nombre de la Carrera o el id de la facultad está vacío:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Complete los Parametros de Creacion")
+
+    career_validation(new_career, db)                           # Validar si la carrera ya existe
+
     create_career(db, new_career, facutie_id)
-    
-    # Retornar un mensaje de éxito
+
     return f"la Carrera {new_career} ha sido creada exitosamente"
 
-#? Eliminar Carrera:
+#! Eliminar Carrera:
 async def delete_career_by_id(career_id: int, db: Session):
-    # Obtener la Carrera por su ID
-    career = career_by_id(db, career_id)
-    
-    # Verificar si la Carrera existe
-    if not career:
+    career = career_by_id(db, career_id)                                            # Obtener la Carrera por su ID
+    if not career:                                                                  # Verificar si la Carrera existe
         raise HTTPException(status_code=404, detail="La carrera no existe")
-    
-    # Eliminar la Carrera
-    delete_by_id(career, db)  # Aquí se pasa la instancia del objeto, no solo el ID
+    delete_by_id(career, db)  
+
+#? Editar Una carrera:
+async def edit_career(career_id: int, career_name: str, facutie_id: str, db: Session): 
+
+    if not career_name or facutie_id == "Facultades":                                           # Verificar si el nombre de la Carrera o el id de la facultad está vacío:
+        raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los Parametros de Edicion")
+
+    career = career_by_id(db, career_id)                                            # Obtener la carrera por su ID
+
+    if not career:                                                                  # Verificar si la carrera existe
+        raise HTTPException(status_code=404, detail="La carrera no existe")
+
+    if career.nombre_carrera == career_name and career.id_facultad == facutie_id:   # Verificar si la actualizacion es nesesaria:
+        raise HTTPException(status_code=404, detail="Los datos de la carrera estan actualizados")
+
+    update_career_by_id(career, career_name, facutie_id, db)
+

@@ -1,21 +1,40 @@
-from data.course_data_base import  create_course, get_all, course_by_id, delete_by_id
+from data.course_data_base import  create_course, get_all, courses_by_faculty, course_by_id, delete_by_id, update_course_by_id
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-#? Octener todas las carreras de la base de datos:
+#? Octener todas las Cursos de la base de datos:
 async def get_all_courses(db: Session): 
     return get_all(db)
 
-#? Crear Nueva Carrera:
-async def create_new_course(new_course: str, id_course: int, db: Session) -> str:
-    # Verificar si el nombre del curso está vacío
-    if not new_course:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Agregue un nombre de Curso")
 
-    # Crear el nuevo curso
-    create_course(db, new_course, id_course)
+#? Octener todas las Cursos filtrado por facultad:
+async def get_courses_by_faculty(faculty_id: int, db: Session):
+    # Realiza la consulta para obtener los cursos filtrados por el id de la facultad
+    result = courses_by_faculty(db, faculty_id) 
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Facultad Sin Cursos")
+
+    courses = []
     
-    # Retornar un mensaje de éxito
+    for course in result:
+        data_curse = {
+            "id_curso": course.id_curso,
+            "nombre_curso": course.nombre_curso,
+            "nombre_carrera": course.carrera.nombre_carrera
+        }
+        courses.append(data_curse)
+
+    return courses
+
+
+#? Crear Nueva Curso:
+async def create_new_course(new_course: str, career_id: int, db: Session) -> str:
+
+    if not new_course or career_id == "Carreras":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Complete los Parametros de Creacion")
+
+    create_course(db, new_course, career_id)
+
     return f"El curso {new_course} ha sido creada exitosamente"
 
 
@@ -31,3 +50,19 @@ async def delete_course_by_id(course_id: int, db: Session):
     # Eliminar el curso
     delete_by_id(course, db)  # Aquí se pasa el instancia del objeto, no solo el ID
 
+
+#? Editar Una Curso:
+async def update_course(course_id: int, course_name: str, career_id: str, db: Session):
+
+    if not course_name or career_id == "Carreras":
+        raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los Parametros de Edicion")
+
+    course = course_by_id(db, course_id)                                            # Obtener la curso por su ID
+
+    if not course:                                                                  # Verificar si la curso existe
+        raise HTTPException(status_code=404, detail="El curso no existe")
+
+    if course.nombre_curso == course_name and course.id_carrera == career_id:       # Verificar si la actualizacion es nesesaria:
+        raise HTTPException(status_code=404, detail="Los datos del curso estan actualizados")
+
+    update_course_by_id(course, course_name, career_id, db)

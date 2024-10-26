@@ -45,7 +45,9 @@
 		aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<form role="form" method="post" action="/dashboard/parameters/faculty">
+
+				<!--! No tocar el id form_edit porque se jode el codigo -->
+				<form parameter-to-update="faculty" id="form_edit" role="form" method="post"> <!-- Trabajando -->
 
 					<div class="modal-header">
 						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar la Facultad</h1>
@@ -648,9 +650,9 @@
 							</div>
 						</form>
 
-						{% if error %}
+						{% if error and error.status_code == 400 or error.status_code == 409 %}
 						<div class="m-0 ps-3">
-							<p class="m-0" style="color:red;">{{ error }}</p>
+							<p class="m-0" style="color:red;">{{ error.detail }}</p>
 						</div>
 						{% endif %}
 
@@ -699,15 +701,15 @@
 												<!-- Trabajando -->
 												<div class="d-flex gap-3">
 
-													<button type="button" class="btn bg-gradient-faded-success mb-0 px-2 w-60 w-sm-50 w-lg-50" data-bs-toggle="modal"
+													<button type="button" class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-50" data-bs-toggle="modal"
 														data-bs-target="#staticBackdrop" data-id="{{ faculty.id_facultad }}">
 														Editar
 													</button>
 
-													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50"
+													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-50"
 														href="/dashboard/parameters/delete/faculty/{{ faculty.id_facultad }}">
 														<button type="button"
-															class="btn bg-gradient-warning mb-0 w-100">
+															class="btn bg-gradient-warning mb-0 px-3 w-100">
 															Eliminar
 														</button>
 													</a>
@@ -715,11 +717,8 @@
 											</td>
 										</tr>
 										{% endfor %}
-
 									</tbody>
-
 								</table>
-
 							</div>
 						</div>
 					</div>
@@ -727,6 +726,12 @@
 			</div>
 
 		</div>
+
+		{% if error and error.status_code == 203 or error.status_code == 404 %}
+		<div class="m-0 ps-4">
+			<p class="m-0" style="color:red;">{{ error.detail }}</p>
+		</div>
+		{% endif %}
 
 	</main>
 
@@ -767,7 +772,7 @@
 	<script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/chartjs.min.js"></script>
-	<script src="/static/js/custom/handle-deleting-parameters.js"></script>
+	<script src="/static/js/custom/handle-editing-parameters.js"></script>
 
 	<script>
 		var win = navigator.platform.indexOf('Win') > -1;

@@ -39,6 +39,50 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
+
+	<!-- Editing Modal -->
+	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+
+				<form parameter-to-update="subject" id="form_edit" role="form" method="post">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar la Materia</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+
+					<div class="modal-body">
+						<div class="d-flex align-items-center gap-2 w-100">
+
+							<input type="text" class="form-control" name="subject_name"
+								placeholder="Nombre de la Materia" aria-label="Subject" aria-describedby="edit_subject">
+
+							<select class="form-select cursor-pointer" aria-label="Default select example"
+								id="select-faculty-edit" name="id_faculty">
+								<option selected>Facultades</option>
+
+								{% for faculty in faculties %}
+								<option value={{faculty.id_facultad}}>{{faculty.nombre_facultad}}</option>
+								{% endfor %}
+							</select>
+
+							<select class="form-select cursor-pointer" aria-label="Default select example"
+								id="select-curso-edit" name="id_course"></select>
+
+						</div>
+					</div>
+					<div class="modal-footer w-100 justify-content-between">
+						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-45">Editar Materia</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
 	<!-- Acordeon de Barra Lateral -->
 	<aside
 		class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white"
@@ -601,34 +645,33 @@
 					<div class="card p-3">
 
 						<form class="d-flex align-items-center justify-content-around flex-wrap gap-2 gap-sm-2 "
-							style="min-height: 3.5rem;" role="form" method="post" action="/dashboard/parameters/subject">
+							style="min-height: 3.5rem;" role="form" method="post"
+							action="/dashboard/parameters/subject">
 
-							<div class="d-flex align-items-center gap-4 w-100 w-md-45 w-lg-45">
-								<input type="text" class="form-control" name="subjects_name" placeholder="Nombre de la Materia" aria-label="Subjects"
+							<div class="d-flex align-items-center gap-4 w-100 w-lg-25">
+								<input type="text" class="form-control" name="subjects_name"
+									placeholder="Nombre de la Materia" aria-label="Subjects"
 									aria-describedby="subjects-addon">
 							</div>
 
-							<div class="d-flex justify-content-between gap-sm-6 text-center w-100 w-md-50 w-lg-50 ">
+							<div class="d-flex justify-content-between gap-2 w-100  w-lg-70 "
+								style="flex-wrap: wrap;">
 
-								<select class="form-select cursor-pointer" aria-label="Default select example" name="id_faculty">
-									<option selected>Seleccionar Facultad</option>
-								
+								<select class="form-select cursor-pointer w-100 w-sm-45 w-md-45 w-lg-35"
+									aria-label="Default select example" id="select-faculty-create" name="id_faculty">
+									<option selected>Facultades</option>
 									{% for faculty in faculties %}
 									<option value={{faculty.id_facultad}}>{{faculty.nombre_facultad}}</option>
 									{% endfor %}
 								</select>
 
-								<select class="form-select cursor-pointer" aria-label="Default select example"
-									name="id_course">
-									<option selected>Seleccionar Curso</option>
 
-									{% for course in courses %}
-									<option value={{course.id_curso}}>{{course.carrera.nombre_carrera}} - {{course.nombre_curso}}</option>
-									{% endfor %}
+								<select class="form-select cursor-pointer w-100 w-sm-45 w-md-50 w-lg-40"
+									aria-label="Default select example" id="select-curso-create"
+									name="id_course"></select>
 
-								</select>
-
-								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-sm-40 w-md-50 w-lg-60">
+								<button type="submit"
+									class="btn bg-gradient-info mb-0 px-2 w-100 w-sm-45 w-md-45 w-lg-20">
 									Crear materia
 								</button>
 
@@ -658,19 +701,23 @@
 
 									<thead>
 										<tr>
-											<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
 												Materia
 											</th>
 
-											<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
 												Curso
 											</th>
 
-											<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
 												Carrera
 											</th>
 
-											<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
+											<th
+												class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-20">
 												Facultad
 											</th>
 
@@ -708,7 +755,8 @@
 											<td>
 												<div class="d-flex px-2 py-1">
 													<div class="d-flex flex-column justify-content-center">
-														<h6 class="mb-0 text-sm">{{subject.curso.carrera.nombre_carrera}}
+														<h6 class="mb-0 text-sm">
+															{{subject.curso.carrera.nombre_carrera}}
 														</h6>
 													</div>
 												</div>
@@ -717,7 +765,8 @@
 											<td>
 												<div class="d-flex px-2 py-1">
 													<div class="d-flex flex-column justify-content-center">
-														<h6 class="mb-0 text-sm">{{subject.curso.carrera.facultad.nombre_facultad}}
+														<h6 class="mb-0 text-sm">
+															{{subject.curso.carrera.facultad.nombre_facultad}}
 														</h6>
 													</div>
 												</div>
@@ -725,13 +774,17 @@
 
 											<td class="align-middle">
 												<div class="d-flex gap-3">
-													<button type="submit"
-														class="btn bg-gradient-faded-success mb-0 px-2 w-60 w-sm-50 w-lg-50">
+													<button type="button"
+														class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-45"
+														data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+														data-id="{{ subject.id_materia }}">
 														Editar
 													</button>
 
-													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50" href="/dashboard/parameters/delete/subject/{{ subject.id_materia }}">
-														<button type="button" class="btn bg-gradient-warning mb-0 w-100">
+													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50"
+														href="/dashboard/parameters/delete/subject/{{ subject.id_materia }}">
+														<button type="button"
+															class="btn bg-gradient-warning mb-0 w-100">
 															Eliminar
 														</button>
 													</a>
@@ -789,6 +842,8 @@
 	<script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/chartjs.min.js"></script>
+	<script src="/static/js/custom/filter-course-by-faculty-whit-AJAX.js"></script>
+	<script src="/static/js/custom/handle-editing-parameters.js"></script>
 
 	<script>
 		var win = navigator.platform.indexOf('Win') > -1;

@@ -44,10 +44,20 @@ def create_faculty(db: Session, faculty_name: str):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-#! Eliminar Materia:
+#! Eliminar Facultad:
 def delete_by_id(faculty, db: Session):
     try:
-        db.delete(faculty)  # Se pasa la instancia de la materia
+        db.delete(faculty)  # Se pasa la instancia de la Facultad
+        db.commit()
+    
+    except SQLAlchemyError as e:
+        # Si ocurre algún error relacionado con la base de datos
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+
+#? Actulizar Facultad:
+def update_faculty_by_id(faculty, facutie_name: str, db: Session):  
+    try:
+        faculty.nombre_facultad = facutie_name
         db.commit()
     
     except SQLAlchemyError as e:

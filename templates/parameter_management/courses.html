@@ -39,6 +39,46 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
+
+	<!-- Editing Modal -->
+	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+
+				<!--! No tocar el id form_edit porque se jode el codigo -->
+				<form parameter-to-update="course" id="form_edit" role="form" method="post"> 
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar el Curso</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+	
+					<div class="modal-body">
+						<div class="d-flex align-items-center gap-2 w-100">
+							<input type="text" class="form-control" name="course_name" placeholder="Nombre del Curso"
+								aria-label="Course" aria-describedby="edit_course">
+
+							<select class="form-select cursor-pointer" aria-label="Default select example"
+								name="career_id">
+								<option selected>Carreras</option>
+
+								{% for career in careers %}
+								<option value={{career.id_carrera}}>{{career.nombre_carrera}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer w-100 justify-content-between">
+						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-45">Editar Carrera</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<!-- Acordeon de Barra Lateral -->
 	<aside
 		class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white"
@@ -608,11 +648,11 @@
 									aria-describedby="course-addon">
 							</div>
 
-							<div class="d-flex justify-content-between gap-sm-6 text-center w-100 w-md-50 w-lg-35 ">
+							<div class="d-flex justify-content-between gap-2 gap-sm-6 text-center w-100 w-md-50 w-lg-35 ">
 
 								<!-- Trabajando -->
 								<select class="form-select cursor-pointer" aria-label="Default select example" name="career_id">
-									<option selected>Seleccionar Carrera</option>
+									<option selected>Carreras</option>
 
 									{% for career in careers %}
 									<option value={{career.id_carrera}}>{{career.nombre_carrera}}</option>
@@ -620,16 +660,18 @@
 
 								</select>
 
-								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-sm-40 w-md-50 w-lg-40">
+								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-50 w-sm-40 w-md-50 w-lg-40">
 									Crear Curso
 								</button>
 							</div>
 						</form>
-						{% if error %}
+
+						{% if error and error.status_code == 400 %}
 						<div class="m-0 ps-3">
-							<p class="m-0" style="color:red;">{{ error }}</p>
+							<p class="m-0" style="color:red;">{{ error.detail }}</p>
 						</div>
 						{% endif %}
+
 					</div>
 				</div>
 			</div>
@@ -701,13 +743,13 @@
 
 											<td class="align-middle">
 												<div class="d-flex gap-3">
-													<button type="submit"
-														class="btn bg-gradient-faded-success mb-0 px-2 w-60 w-sm-50 w-lg-50">
+													<button type="button" class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-45" data-bs-toggle="modal"
+														data-bs-target="#staticBackdrop" data-id="{{ course.id_curso }}">
 														Editar
 													</button>
 
-													<a class="mb-0 px-2 w-60 w-sm-50 w-lg-50" href="/dashboard/parameters/delete/course/{{ course.id_curso }}">
-														<button type="button" class="btn bg-gradient-warning mb-0 ">
+													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-50" href="/dashboard/parameters/delete/course/{{ course.id_curso }}">
+														<button type="button" class="btn bg-gradient-warning mb-0 px-3 w-100">
 															Eliminar
 														</button>
 													</a>
@@ -727,6 +769,12 @@
 			</div>
 
 		</div>
+
+		{% if error and error.status_code == 203 or error.status_code == 404 %}
+		<div class="m-0 ps-4">
+			<p class="m-0" style="color:red;">{{ error.detail }}</p>
+		</div>
+		{% endif %}
 
 	</main>
 
@@ -767,6 +815,7 @@
 	<script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
 	<script src="/static/js/plugins/chartjs.min.js"></script>
+	<script src="/static/js/custom/handle-editing-parameters.js"></script>
 
 	<script>
 		var win = navigator.platform.indexOf('Win') > -1;

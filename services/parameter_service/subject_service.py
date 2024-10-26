@@ -1,4 +1,4 @@
-from data.subject_data_base import create_subject, get_all, get_by_id ,delete_by_id
+from data.subject_data_base import create_subject, get_all, get_by_id, delete_by_id, subject_by_id, update_subject_by_id
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -31,3 +31,18 @@ async def delete_subject_by_id(subject_id: int, db: Session):
     delete_by_id(subject, db)  # Aquí se pasa la instancia del objeto, no solo el ID
 
 
+#? Editar Una Materia:
+async def update_subject(subject_id: int, subject_name: str, id_course: str, db: Session):
+
+    if not subject_name or id_course == "Cursos":
+        raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los Parametros de Edicion")
+
+    subject = subject_by_id(db, subject_id)                                            # Obtener la Materia por su ID
+
+    if not subject:                                                                  # Verificar si la Materia existe
+        raise HTTPException(status_code=404, detail="La materia no existe")
+
+    if subject.nombre_materia == subject_name and subject.id_carrera == id_course:       # Verificar si la actualizacion es nesesaria:
+        raise HTTPException(status_code=404, detail="Los datos de la Materia estan actualizados")
+
+    update_subject_by_id(subject, subject_name, id_course, db)

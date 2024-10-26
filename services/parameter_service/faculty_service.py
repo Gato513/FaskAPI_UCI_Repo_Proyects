@@ -1,9 +1,7 @@
 from passlib.context import CryptContext
-from data.faculty_data_base import faculty_by_name, create_faculty, get_all, faculty_by_id, delete_by_id
+from data.faculty_data_base import faculty_by_name, create_faculty, get_all, faculty_by_id, delete_by_id, update_faculty_by_id
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-
-
 
 def faculty_validation(faculty_name: str, db: Session):
     faculty_exist = faculty_by_name(db, faculty_name) #! Verificar si la facultad ya existe en la base de datos
@@ -14,9 +12,11 @@ def faculty_validation(faculty_name: str, db: Session):
     
     return faculty_exist
 
+#? Octener todas las Facultades de la base de datos:
 async def get_all_faculties(db: Session): 
     return get_all(db)
 
+#? Crear Nueva Facultad:
 async def create_new_faculty(new_faculty: str, db: Session) -> str:
     # Verificar si el nombre de la facultad está vacío
     if not new_faculty:
@@ -42,3 +42,25 @@ async def delete_faculty_by_id(faculty_id: int, db: Session):
     
     # Eliminar la facultad
     delete_by_id(faculty, db)  # Aquí se pasa la instancia del objeto, no solo el ID
+
+#? Editar Una facultad:
+async def edit_faculty(faculty_id: int, facutie_name: str, db: Session):
+
+    # Verificar si el nombre de la facultad está vacío
+    if not facutie_name:
+        raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los parametros de Edicion")
+    
+    # Obtener la facultad por su ID
+    faculty = faculty_by_id(db, faculty_id)
+    
+    # Verificar si la facultad existe
+    if not faculty:
+        raise HTTPException(status_code=404, detail="La facultad no existe")
+
+    # Verificar si la actualizacion es nesesaria:
+    if faculty.nombre_facultad == facutie_name:
+        raise HTTPException(status_code=404, detail="Los datos de la Facultad estan actualizados")
+    
+    # acutualizar la facultad la facultad
+    update_faculty_by_id(faculty, facutie_name, db)  # Aquí se pasa la instancia del objeto, no solo el ID
+
