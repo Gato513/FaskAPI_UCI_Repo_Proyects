@@ -29,7 +29,7 @@ async def crear_subject(request: Request, subjects_name: str = Form(...), id_cou
         await create_new_subjec(subjects_name, id_course, db)
         return await render_subjects_page(request, db)
     except HTTPException as e:
-        return await render_subjects_page(request, db, error=e.detail)
+        return await render_subjects_page(request, db, error=e)
 
 
 #? Eliminar Materia y redirigir a la lista de materias actualizada:
@@ -44,7 +44,7 @@ async def delete_subject(request: Request, subject_id: int, db: Session = Depend
     
     except HTTPException as e:
         # Si hay un error, igual renderizas la página con el mensaje de error
-        return await render_subjects_page(request, db, error=e.detail)
+        return await render_subjects_page(request, db, error=e)
 
 
 #? Actualizar Curso y redirigir a la lista de Cursos actualizada:

@@ -43,7 +43,7 @@
 	<!-- Editing Modal -->
 	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
 		aria-labelledby="staticBackdropLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-dialog modal-dialog-centered w-50">
 			<div class="modal-content">
 
 				<form parameter-to-update="subject" id="form_edit" role="form" method="post">
@@ -679,9 +679,9 @@
 
 						</form>
 
-						{% if error %}
+						{% if error and error.status_code == 400 %}
 						<div class="m-0 ps-3">
-							<p class="m-0" style="color:red;">{{ error }}</p>
+							<p class="m-0" style="color:red;">{{ error.detail }}</p>
 						</div>
 						{% endif %}
 
@@ -803,6 +803,13 @@
 			</div>
 
 		</div>
+
+		{% if error and error.status_code == 203 or error.status_code == 404 %}
+		<div class="m-0 ps-4">
+			<p class="m-0" style="color:red;">{{ error.detail }}</p>
+		</div>
+		{% endif %}
+
 	</main>
 
 	<div class="fixed-plugin">

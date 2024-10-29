@@ -9,8 +9,9 @@ async def get_all_subject(db: Session):
 #? Crear Nueva Carrera:
 async def create_new_subjec(new_subjects: str, id_course: int, db: Session) -> str:
     # Verificar si el nombre de la Materia está vacío
-    if not new_subjects:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Agregue un nombre de Materia")
+
+    if not new_subjects or not id_course.isdigit():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Complete los Parametros de Creacion")
 
     # Crear la nuevo Materia
     create_subject(db, new_subjects, id_course)
@@ -34,7 +35,7 @@ async def delete_subject_by_id(subject_id: int, db: Session):
 #? Editar Una Materia:
 async def update_subject(subject_id: int, subject_name: str, id_course: str, db: Session):
 
-    if not subject_name or id_course == "Cursos":
+    if not subject_name or not id_course.isdigit():
         raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los Parametros de Edicion")
 
     subject = subject_by_id(db, subject_id)                                            # Obtener la Materia por su ID
