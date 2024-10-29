@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean,  ForeignKey
 from sqlalchemy.orm import relationship
 from config.database_config import Base
 
@@ -19,6 +19,7 @@ class Facultad(Base):
     __tablename__ = "facultad"
     id_facultad = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre_facultad = Column(String(255), nullable=False)
+    is_activated = Column(Boolean(), nullable=False, default=True)  #@ Trabajando
     carreras = relationship("Carrera", back_populates="facultad")
 
 class Carrera(Base):

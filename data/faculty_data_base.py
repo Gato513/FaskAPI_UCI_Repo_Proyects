@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
 
-#* Función para obtener todas las facultades:
-def get_all(db: Session):
+#@ Función para obtener todas las facultades:
+def all_faculties(db: Session):
     try:
         faculties_data = db.query(Facultad).all()
         return faculties_data
@@ -14,7 +14,7 @@ def get_all(db: Session):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-#* Función para obtener facultad por su nombre:
+#@ Función para obtener facultad por su nombre:
 def faculty_by_name(db: Session, faculty_name: str):
     try:
         faculty_data = db.query(Facultad).filter(Facultad.nombre_facultad == faculty_name).first()
@@ -24,7 +24,7 @@ def faculty_by_name(db: Session, faculty_name: str):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-#* Función para obtener una facultad por su id:
+#@ Función para obtener una facultad por su id:
 def faculty_by_id(db: Session, id_facultad: str):
     try:
         return db.query(Facultad).filter(Facultad.id_facultad == id_facultad).first()
@@ -32,7 +32,7 @@ def faculty_by_id(db: Session, id_facultad: str):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-#* Función para crear una facultad
+#( Función para crear una facultad
 def create_faculty(db: Session, faculty_name: str):
     try:
         new_faculty = Facultad(nombre_facultad=faculty_name)
@@ -45,7 +45,7 @@ def create_faculty(db: Session, faculty_name: str):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
 #! Eliminar Facultad:
-def delete_by_id(faculty, db: Session):
+def delete_faculty(faculty, db: Session):
     try:
         db.delete(faculty)  # Se pasa la instancia de la Facultad
         db.commit()
@@ -55,11 +55,19 @@ def delete_by_id(faculty, db: Session):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
 #? Actulizar Facultad:
-def update_faculty_by_id(faculty, facutie_name: str, db: Session):  
+def update_faculty(faculty, facutie_name: str, db: Session):  
     try:
         faculty.nombre_facultad = facutie_name
         db.commit()
     
     except SQLAlchemyError as e:
         # Si ocurre algún error relacionado con la base de datos
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+
+#% Actulizar Facultad:
+def deactivate_faculty(faculty, db: Session):  
+    try:
+        faculty.is_activated = False
+        db.commit()
+    except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")

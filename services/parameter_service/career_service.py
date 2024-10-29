@@ -1,4 +1,5 @@
 from data.career_data_base import create_career, get_all, career_by_id, career_by_name, delete_by_id, update_career_by_id
+from data.course_data_base import check_course_dependencies
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -11,11 +12,11 @@ def career_validation(career_name: str, db: Session):
     
     return career_exist
 
-#? Octener todas las carreras de la base de datos:
+#@ Octener todas las carreras de la base de datos:
 async def get_all_careers(db: Session): 
     return get_all(db)
 
-#? Crear Nueva Carrera:
+#$ Crear Nueva Carrera:
 async def create_new_career(new_career: str, facutie_id: str, db: Session) -> str:
 
     if not new_career or facutie_id == "Facultades":            # Verificar si el nombre de la Carrera o el id de la facultad está vacío:
@@ -29,9 +30,22 @@ async def create_new_career(new_career: str, facutie_id: str, db: Session) -> st
 
 #! Eliminar Carrera:
 async def delete_career_by_id(career_id: int, db: Session):
-    career = career_by_id(db, career_id)                                            # Obtener la Carrera por su ID
-    if not career:                                                                  # Verificar si la Carrera existe
-        raise HTTPException(status_code=404, detail="La carrera no existe")
+
+    # Obtener y verificar si la carrera existe:
+    career = career_by_id(db, career_id)
+    if not career:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="La carrera no existe"
+        )
+    
+    # Verificar si existen dependencias activas con cursos
+    if check_course_dependencies(db, career_id):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Esta carrera no se puede eliminar. Existe una relación activa con cursos. Elimine primero la relación."
+        )
+
     delete_by_id(career, db)  
 
 #? Editar Una carrera:
@@ -43,10 +57,10 @@ async def edit_career(career_id: int, career_name: str, facutie_id: str, db: Ses
     career = career_by_id(db, career_id)                                            # Obtener la carrera por su ID
 
     if not career:                                                                  # Verificar si la carrera existe
-        raise HTTPException(status_code=404, detail="La carrera no existe")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La carrera no existe")
 
     if career.nombre_carrera == career_name and career.id_facultad == facutie_id:   # Verificar si la actualizacion es nesesaria:
-        raise HTTPException(status_code=404, detail="Los datos de la carrera estan actualizados")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Los datos de la carrera estan actualizados")
 
     update_career_by_id(career, career_name, facutie_id, db)
 

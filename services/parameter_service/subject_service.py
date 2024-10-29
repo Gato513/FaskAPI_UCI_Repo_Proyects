@@ -26,7 +26,7 @@ async def delete_subject_by_id(subject_id: int, db: Session):
     
     # Verificar si la materia existe
     if not subject:
-        raise HTTPException(status_code=404, detail="La materia no existe")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La materia no existe")
     
     # Eliminar la materia
     delete_by_id(subject, db)  # Aquí se pasa la instancia del objeto, no solo el ID
@@ -38,12 +38,15 @@ async def update_subject(subject_id: int, subject_name: str, id_course: str, db:
     if not subject_name or not id_course.isdigit():
         raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION, detail="Complete los Parametros de Edicion")
 
-    subject = subject_by_id(db, subject_id)                                            # Obtener la Materia por su ID
+    # Verificar si la Materia existe
+    subject = subject_by_id(db, subject_id)
 
-    if not subject:                                                                  # Verificar si la Materia existe
-        raise HTTPException(status_code=404, detail="La materia no existe")
+    # Verificar si la Materia existe
+    if not subject:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="La materia no existe")
 
-    if subject.nombre_materia == subject_name and subject.id_carrera == id_course:       # Verificar si la actualizacion es nesesaria:
-        raise HTTPException(status_code=404, detail="Los datos de la Materia estan actualizados")
+    # Verificar si la actualizacion es nesesaria:
+    if subject.nombre_materia == subject_name and subject.id_curso == id_course:        
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Los datos de la Materia estan actualizados")
 
     update_subject_by_id(subject, subject_name, id_course, db)

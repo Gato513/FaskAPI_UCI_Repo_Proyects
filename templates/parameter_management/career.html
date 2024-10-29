@@ -48,37 +48,38 @@
 
 				<!--! No tocar el id form_edit porque se jode el codigo -->
 				<form parameter-to-update="career" id="form_edit" role="form" method="post"> <!-- Trabajando -->
-	
+
 					<div class="modal-header">
 						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar la Carrera</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-	
-					<div class="modal-body">
-	
-						<div class="d-flex align-items-center gap-2 w-100">
-							<input type="text" class="form-control" name="career_name" placeholder="Nombre de la Carrera"
-								aria-label="Carrera" aria-describedby="edit_career">
 
-							<select class="form-select cursor-pointer" aria-label="Default select example" name="facutie_id">
+					<div class="modal-body">
+
+						<div class="d-flex align-items-center gap-2 w-100">
+							<input type="text" class="form-control" name="career_name"
+								placeholder="Nombre de la Carrera" aria-label="Carrera" aria-describedby="edit_career">
+
+							<select class="form-select cursor-pointer" aria-label="Default select example"
+								name="facutie_id">
 								<option selected>Facultades</option>
-							
+
 								{% for faculty in faculties %}
 								<option value={{faculty.id_facultad}}>{{faculty.nombre_facultad}}</option>
 								{% endfor %}
-							
+
 							</select>
 						</div>
 
-						
-	
+
+
 					</div>
 					<div class="modal-footer w-100 justify-content-between">
 						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45"
 							data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-45">Editar Carrera</button>
 					</div>
-	
+
 				</form>
 			</div>
 		</div>
@@ -654,20 +655,23 @@
 									aria-describedby="career-addon">
 							</div>
 
-							<div class="d-flex justify-content-between gap-2 gap-sm-6 text-center w-100 w-md-50 w-lg-45 ">
+							<div
+								class="d-flex justify-content-between gap-2 gap-sm-6 text-center w-100 w-md-50 w-lg-45 ">
 
 								<!-- Trabajando -->
 
-								<select class="form-select cursor-pointer" aria-label="Default select example" name="facutie_id">
+								<select class="form-select cursor-pointer" aria-label="Default select example"
+									name="facutie_id">
 									<option selected>Facultades</option>
 
 									{% for faculty in faculties %}
-									<option value={{faculty.id_facultad}} >{{faculty.nombre_facultad}}</option>
+									<option value={{faculty.id_facultad}}>{{faculty.nombre_facultad}}</option>
 									{% endfor %}
 
 								</select>
 
-								<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-50 w-sm-40 w-md-50 w-lg-40">
+								<button type="submit"
+									class="btn bg-gradient-info mb-0 px-2 w-50 w-sm-40 w-md-50 w-lg-40">
 									Crear Carrera
 								</button>
 
@@ -715,6 +719,8 @@
 
 									<tbody>
 										{% for career in careers %}
+
+										{% if career.facultad.is_activated %}
 										<tr>
 											<td>
 												<div class="d-flex px-2 py-1">
@@ -740,13 +746,17 @@
 											<td class="align-middle">
 												<div class="d-flex gap-3">
 
-													<button type="button" class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-50" data-bs-toggle="modal"
-														data-bs-target="#staticBackdrop" data-id="{{ career.id_carrera }}">
+													<button type="button"
+														class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-50"
+														data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+														data-id="{{ career.id_carrera }}">
 														Editar
 													</button>
 
-													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-50" href="/dashboard/parameters/delete/career/{{ career.id_carrera }}">
-														<button type="button" class="btn bg-gradient-warning mb-0 px-3 w-100 ">
+													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-50"
+														href="/dashboard/parameters/delete/career/{{ career.id_carrera }}">
+														<button type="button"
+															class="btn bg-gradient-warning mb-0 px-3 w-100 ">
 															Eliminar
 														</button>
 													</a>
@@ -754,9 +764,8 @@
 												</div>
 											</td>
 										</tr>
+										{% endif %}
 										{% endfor %}
-										<!-- Trabajando -->
-
 									</tbody>
 
 								</table>
@@ -769,7 +778,7 @@
 
 		</div>
 
-		{% if error and error.status_code == 203 or error.status_code == 404 %}
+		{% if error and error.status_code == 203 or error.status_code == 404 or error.status_code == 422 %}
 		<div class="m-0 ps-4">
 			<p class="m-0" style="color:red;">{{ error.detail }}</p>
 		</div>

@@ -1,13 +1,14 @@
 from data.course_data_base import  create_course, get_all, courses_by_faculty, course_by_id, delete_by_id, update_course_by_id
+from data.subject_data_base import check_subjects_dependencies
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-#? Octener todas las Cursos de la base de datos:
+#@ Octener todas las Cursos de la base de datos:
 async def get_all_courses(db: Session): 
     return get_all(db)
 
 
-#? Octener todas las Cursos filtrado por facultad:
+#@ Octener todas las Cursos filtrado por facultad:
 async def get_courses_by_faculty(faculty_id: int, db: Session):
     # Realiza la consulta para obtener los cursos filtrados por el id de la facultad
     result = courses_by_faculty(db, faculty_id) 
@@ -27,7 +28,7 @@ async def get_courses_by_faculty(faculty_id: int, db: Session):
     return courses
 
 
-#? Crear Nueva Curso:
+#() Crear Nueva Curso:
 async def create_new_course(new_course: str, career_id: int, db: Session) -> str:
 
     if not new_course or career_id == "Carreras":
@@ -37,18 +38,26 @@ async def create_new_course(new_course: str, career_id: int, db: Session) -> str
 
     return f"El curso {new_course} ha sido creada exitosamente"
 
-
-#? Eliminar curso:
+#! Eliminar curso:
 async def delete_course_by_id(course_id: int, db: Session):
-    # Obtener el curso por su ID
+
+    # Obtener y verificar si la carrera existe:
     course = course_by_id(db, course_id)
-    
-    # Verificar si el curso existe
     if not course:
-        raise HTTPException(status_code=404, detail="El curso no existe")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="El curso no existe"
+        )
     
-    # Eliminar el curso
-    delete_by_id(course, db)  # Aquí se pasa el instancia del objeto, no solo el ID
+    # Verificar si existen dependencias activas con materias
+    if check_subjects_dependencies(db, course_id):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Este curso no se puede eliminar. Existe una relación activa con materias. Elimine primero la relación."
+        )
+    
+    # Eliminar el curso de la DB:
+    delete_by_id(course, db)
 
 
 #? Editar Una Curso:
@@ -60,9 +69,9 @@ async def update_course(course_id: int, course_name: str, career_id: str, db: Se
     course = course_by_id(db, course_id)                                            # Obtener la curso por su ID
 
     if not course:                                                                  # Verificar si la curso existe
-        raise HTTPException(status_code=404, detail="El curso no existe")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El curso no existe")
 
     if course.nombre_curso == course_name and course.id_carrera == career_id:       # Verificar si la actualizacion es nesesaria:
-        raise HTTPException(status_code=404, detail="Los datos del curso estan actualizados")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Los datos del curso estan actualizados")
 
     update_course_by_id(course, course_name, career_id, db)

@@ -1,4 +1,4 @@
-from fastapi import Request, Form, Depends, HTTPException, Response
+from fastapi import Request, Form, Depends, HTTPException, Response, status
 from fastapi.responses import RedirectResponse  # Importa RedirectResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
@@ -25,7 +25,7 @@ async def user_login(response: Response, request: Request, email: str = Form(...
         )
 
         # Redirigir a /dashboard después de configurar la cookie
-        return RedirectResponse(url="/dashboard/projects/show_project", status_code=303, headers=response.headers)
+        return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_303_SEE_OTHER, headers=response.headers)
 
     except HTTPException as e:
         return templates.TemplateResponse("login.html", {"request": request, "error": e.detail})  # Manejo de errores generales

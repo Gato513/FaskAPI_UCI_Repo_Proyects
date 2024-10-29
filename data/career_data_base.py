@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
 
-# Función para obtener todas las carreras:
+#$ CRUD Basico:
+#@ Función para obtener todas las carreras:
 def get_all(db: Session):
     try:
         careers_data = db.query(Carrera).all()
@@ -14,7 +15,7 @@ def get_all(db: Session):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-# Función para obtener una carrera por id:
+#@ Función para obtener una carrera por id:
 def career_by_id(db: Session, career_id: int):
     try:
         return db.query(Carrera).filter(Carrera.id_carrera == career_id).first()
@@ -23,7 +24,7 @@ def career_by_id(db: Session, career_id: int):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-# Función para obtener carrera por su nombre:
+#@ Función para obtener carrera por su nombre:
 def career_by_name(db: Session, career_name: str):
     try:
         career_data = db.query(Carrera).filter(Carrera.nombre_carrera == career_name).first()
@@ -33,7 +34,7 @@ def career_by_name(db: Session, career_name: str):
         # Si ocurre algún error relacionado con la base de datos
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
 
-#* Función para Crear Carrera:
+#( Función para Crear Carrera:
 def create_career(db: Session, career_name: str, facutie_id: int):
     try:
         new_career = Carrera(nombre_carrera=career_name, id_facultad=facutie_id)
@@ -65,3 +66,13 @@ def update_career_by_id(career, career_name: str, facutie_id: str, db: Session):
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos") 
+
+
+#$ Validaciones de Dependencias:
+#% Función para verificar si existen dependencias de carrera para una facultad
+def check_career_dependencies(db: Session, faculty_id: int) -> bool:
+    try:
+        exists = db.query(Carrera).filter(Carrera.id_facultad == faculty_id).first() is not None #? Consulta si existen carreras asociadas a la facultad
+        return exists
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")

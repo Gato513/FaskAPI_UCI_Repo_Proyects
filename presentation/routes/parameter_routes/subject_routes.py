@@ -7,7 +7,7 @@ from services.parameter_service.faculty_service import get_all_faculties
 from config.database_config import get_db
 
 
-#? Renderizar Materias y Cursos
+#@ Renderizar Materias y Cursos
 async def render_subjects_page(request: Request, db: Session, error: str = None):
     faculties = await get_all_faculties(db)   # Obtener todas las Facultades
     subjects = await get_all_subject(db)     # Obtener todas las materias.
@@ -16,13 +16,12 @@ async def render_subjects_page(request: Request, db: Session, error: str = None)
         {"request": request, "faculties": faculties, "subjects": subjects, "error": error}
     )
 
-#? Mostrar Materias:
+#@ Mostrar Materias:
 @router.get("/subject")
 async def show_subject(request: Request, db: Session = Depends(get_db)):
     return await render_subjects_page(request, db)
 
-
-#? Crear Materia:
+#( Crear Materia:
 @router.post("/subject")
 async def crear_subject(request: Request, subjects_name: str = Form(...), id_course: str = Form(...), db: Session = Depends(get_db)):
     try:
@@ -31,8 +30,7 @@ async def crear_subject(request: Request, subjects_name: str = Form(...), id_cou
     except HTTPException as e:
         return await render_subjects_page(request, db, error=e)
 
-
-#? Eliminar Materia y redirigir a la lista de materias actualizada:
+#! Eliminar Materia:
 @router.get("/delete/subject/{subject_id}")
 async def delete_subject(request: Request, subject_id: int, db: Session = Depends(get_db)):
     try:
@@ -46,8 +44,7 @@ async def delete_subject(request: Request, subject_id: int, db: Session = Depend
         # Si hay un error, igual renderizas la página con el mensaje de error
         return await render_subjects_page(request, db, error=e)
 
-
-#? Actualizar Curso y redirigir a la lista de Cursos actualizada:
+#? Actualizar Curso:
 @router.post("/update/subject/{subject_id}")
 async def edit_subject(request: Request, subject_id: int, subject_name: str = Form(...), id_course: str = Form(...), db: Session = Depends(get_db)):
 

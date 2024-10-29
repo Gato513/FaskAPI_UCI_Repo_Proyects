@@ -8,7 +8,7 @@ from services.parameter_service.career_service  import  get_all_careers
 
 from config.database_config import get_db
 
-#? Renderizar Cursos:
+#@ Renderizar Paginas:
 async def render_course_page(request: Request, db: Session, error: str = None):
     courses = await get_all_courses(db) # Octener todos los cursos.
     careers = await get_all_careers(db) # Octener todas las carreras.
@@ -18,23 +18,12 @@ async def render_course_page(request: Request, db: Session, error: str = None):
         {"request": request, "courses": courses, "careers": careers, "error": error}
     )
 
-#* Retornar cursos filtrados 
-@router.get("/courses_by_faculty/{faculty_id}")
-async def get_courses_by_faculty_id(faculty_id: int, db: Session = Depends(get_db)):
-    try:
-        courses = await get_courses_by_faculty(faculty_id, db)
-        return { "status_code": 200, "courses": courses }
-
-    except HTTPException as e:
-        return { "status_code": e.status_code, "error_detail": e.detail }
-
-#? Renderizar Cursos:
+#@ Renderizar Cursos:
 @router.get("/course")
 async def show_course(request: Request, db: Session = Depends(get_db)):
     return await render_course_page(request, db)
 
-
-#? Crear Cursos:
+#() Crear Cursos:
 @router.post("/course")
 async def crear_course(request: Request, course_name: str = Form(...), career_id: str = Form(...), db: Session = Depends(get_db)):
     try:
@@ -43,8 +32,7 @@ async def crear_course(request: Request, course_name: str = Form(...), career_id
     except HTTPException as e:
         return await render_course_page(request, db, error=e)
 
-
-#? Eliminar Curso y redirigir a la lista de Cursos actualizada:
+#! Eliminar Curso:
 @router.get("/delete/course/{course_id}")
 async def delete_course(request: Request, course_id: int, db: Session = Depends(get_db)):
     try:
@@ -53,8 +41,7 @@ async def delete_course(request: Request, course_id: int, db: Session = Depends(
     except HTTPException as e:
         return await render_course_page(request, db, error=e)
 
-
-#? Actualizar Curso y redirigir a la lista de Cursos actualizada:
+#? Actualizar Curso:
 @router.post("/update/course/{course_id}")
 async def edit_course(request: Request, course_id: int, course_name: str = Form(...), career_id: str = Form(...), db: Session = Depends(get_db)):
 
@@ -65,3 +52,13 @@ async def edit_course(request: Request, course_id: int, course_name: str = Form(
     except HTTPException as e:
         # Si hay un error, igual renderizas la página con el mensaje de error
         return await render_course_page(request, db, error=e)
+
+#% Retornar cursos filtrados 
+@router.get("/courses_by_faculty/{faculty_id}")
+async def get_courses_by_faculty_id(faculty_id: int, db: Session = Depends(get_db)):
+    try:
+        courses = await get_courses_by_faculty(faculty_id, db)
+        return { "status_code": 200, "courses": courses }
+
+    except HTTPException as e:
+        return { "status_code": e.status_code, "error_detail": e.detail }

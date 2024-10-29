@@ -6,7 +6,7 @@ from services.parameter_service.career_service  import  get_all_careers, create_
 from services.parameter_service.faculty_service import  get_all_faculties
 from config.database_config import get_db
 
-#? Renderizar Materias y Cursos
+#@ Renderizar Materias y Cursos
 async def render_careers_page(request: Request, db: Session, error: str = None):
     careers = await get_all_careers(db)  # Obtener todas las carreras.
     faculties = await get_all_faculties(db)   # Obtener todos las facultades.
@@ -16,12 +16,12 @@ async def render_careers_page(request: Request, db: Session, error: str = None):
         {"request": request, "careers": careers, "faculties": faculties, "error": error}
     )
 
-#? Renderizar Carreras:
+#@ Renderizar Carreras:
 @router.get("/career")
 async def show_career(request: Request, db: Session = Depends(get_db)):
     return await render_careers_page(request, db)
 
-#? Crear Carreras:
+#$ Crear Carreras:
 @router.post("/career")
 async def crear_career(request: Request, career_name: str = Form(...), facutie_id: str = Form(...), db: Session = Depends(get_db)):
     try:
@@ -30,7 +30,7 @@ async def crear_career(request: Request, career_name: str = Form(...), facutie_i
     except HTTPException as e:
         return await render_careers_page(request, db, error=e)
 
-#? Eliminar Materia y redirigir a la lista de materias actualizada:
+#! Eliminar Materia y redirigir a la lista de materias actualizada:
 @router.get("/delete/career/{career_id}")
 async def delete_career(request: Request, career_id: int, db: Session = Depends(get_db)):
     try:

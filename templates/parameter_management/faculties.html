@@ -45,9 +45,7 @@
 		aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered w-30">
 			<div class="modal-content">
-
-				<!--! No tocar el id form_edit porque se jode el codigo -->
-				<form parameter-to-update="faculty" id="form_edit" role="form" method="post"> <!-- Trabajando -->
+				<form parameter-to-update="faculty" id="form_edit" role="form" method="post">
 
 					<div class="modal-header">
 						<h1 class="modal-title fs-5" id="staticBackdropLabel">Editar la Facultad</h1>
@@ -64,7 +62,8 @@
 
 					</div>
 					<div class="modal-footer w-100 justify-content-between">
-						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45" data-bs-dismiss="modal">Cancelar</button>
+						<button type="button" class="btn bg-gradient-danger mb-0 px-2 w-45"
+							data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn bg-gradient-info mb-0 px-2 w-45">Editar Facultad</button>
 					</div>
 
@@ -73,7 +72,7 @@
 		</div>
 	</div>
 
-	<!-- Acordeon de Barra Lateral -->
+	<!-- Barra Lateral -->
 	<aside
 		class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white"
 		id="sidenav-main" data-color="info">
@@ -684,6 +683,8 @@
 
 									<tbody>
 										{% for faculty in faculties %}
+
+										{% if faculty.is_activated %}
 										<tr>
 											<td>
 												<div class="d-flex px-2 py-1">
@@ -701,23 +702,36 @@
 												<!-- Trabajando -->
 												<div class="d-flex gap-3">
 
-													<button type="button" class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-50" data-bs-toggle="modal"
-														data-bs-target="#staticBackdrop" data-id="{{ faculty.id_facultad }}">
+													<button type="button"
+														class="btn bg-gradient-faded-success mb-0 w-60 w-sm-50 w-lg-30"
+														data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+														data-id="{{ faculty.id_facultad }}">
 														Editar
 													</button>
 
-													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-50"
-														href="/dashboard/parameters/delete/faculty/{{ faculty.id_facultad }}">
+													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-30"
+														href="/dashboard/parameters/deactivate/faculty/{{ faculty.id_facultad }}">
 														<button type="button"
 															class="btn bg-gradient-warning mb-0 px-3 w-100">
+															Desactivar
+														</button>
+													</a>
+
+													<a class="mb-0 p-0 w-60 w-sm-50 w-lg-30"
+														href="/dashboard/parameters/delete/faculty/{{ faculty.id_facultad }}">
+														<button type="button"
+															class="btn bg-gradient-danger mb-0 px-3 w-100">
 															Eliminar
 														</button>
 													</a>
 												</div>
 											</td>
 										</tr>
+										{% endif %}
+
 										{% endfor %}
 									</tbody>
+
 								</table>
 							</div>
 						</div>
@@ -727,7 +741,7 @@
 
 		</div>
 
-		{% if error and error.status_code == 203 or error.status_code == 404 %}
+		{% if error and error.status_code == 203 or error.status_code == 404 or error.status_code == 422 %}
 		<div class="m-0 ps-4">
 			<p class="m-0" style="color:red;">{{ error.detail }}</p>
 		</div>
