@@ -109,12 +109,13 @@ class Usuario(Base):
     user_phone = Column(String(20), nullable=False, unique=True)
     user_document = Column(String(20), nullable=False, unique=True)
     user_address = Column(String(100), nullable=False)
-    user_matricula = Column(String(100), nullable=True)
+    user_matricula = Column(String(100), nullable=True) # Solo nesesario si es un Alumno.
     user_email = Column(String(50), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
     salt = Column(String(64), nullable=False)
-    role = Column(String(10), nullable=False)  # Rol: "profesor" o "alumno"
+    role = Column(String(10), nullable=False) # Rol: "Admin", "profesor" y "alumno"
     
+    #$ Seccion de Relaciones de los Usuarios:
     # Clave foránea a facultad si es alumno
     facultad_id = Column(Integer, ForeignKey("facultad.id_facultad"), nullable=True)
 
