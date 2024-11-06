@@ -2,14 +2,14 @@ from fastapi import Request, Form, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from config.server_config import router, templates
-from services.parameter_service.career_service  import  get_all_careers, create_new_career, delete_career_by_id, edit_career
-from services.parameter_service.faculty_service import  get_all_faculties
+from services.parameter_service.career_service  import  fetch_all_careers, create_new_career, delete_career_by_id, edit_career
+from services.parameter_service.faculty_service import  fetch_all_faculties
 from config.database_config import get_db
 
 #@ Renderizar Materias y Cursos
 async def render_careers_page(request: Request, db: Session, error: str = None):
-    careers = await get_all_careers(db)  # Obtener todas las carreras.
-    faculties = await get_all_faculties(db)   # Obtener todos las facultades.
+    careers = await fetch_all_careers(db)  # Obtener todas las carreras.
+    faculties = await fetch_all_faculties(db)   # Obtener todos las facultades.
     
     return templates.TemplateResponse(
         "parameter_management/career.html",

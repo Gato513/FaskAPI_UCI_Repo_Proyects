@@ -6,11 +6,12 @@ from fastapi import HTTPException, status
 
 #$ CRUD Basico:
 #@ Función para obtener todos los cursos:
-def get_all(db: Session):
+def get_all_courses(db: Session):
     try:
         return db.query(Curso).all()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #@ Función para obtener todos los cursos filtrados por id de la facultad:
 def courses_by_faculty(db: Session, faculty_id: str):
@@ -18,7 +19,8 @@ def courses_by_faculty(db: Session, faculty_id: str):
         response = db.query(Curso).filter(Curso.carrera.has(id_facultad=faculty_id)).all()
         return response
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #@ Función para obtener una curso por id:
 def course_by_id(db: Session, course_id: int):
@@ -26,8 +28,8 @@ def course_by_id(db: Session, course_id: int):
         return db.query(Curso).filter(Curso.id_curso == course_id).first()
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #@ Función para obtener un curso por su nombre:
 def course_by_name(db: Session, course_name: str):
@@ -36,8 +38,8 @@ def course_by_name(db: Session, course_name: str):
         return course_data
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #() Función para crear un curso:
 def create_course(db: Session, course_name: str, id_course: int):
@@ -48,8 +50,8 @@ def create_course(db: Session, course_name: str, id_course: int):
         db.refresh(new_course)
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #! Eliminar course:
 def delete_by_id(course, db: Session):
@@ -58,8 +60,8 @@ def delete_by_id(course, db: Session):
         db.commit()
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #? Actulizar Curso:
 def update_course_by_id(course, course_name: str, career_id: str, db: Session): 
@@ -68,7 +70,8 @@ def update_course_by_id(course, course_name: str, career_id: str, db: Session):
         course.id_carrera = career_id
         db.commit()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos") 
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 
 #$ Validaciones de Dependencias:
@@ -78,4 +81,5 @@ def check_course_dependencies(db: Session, career_id: int) -> bool:
         exists = db.query(Curso).filter(Curso.id_carrera == career_id).first() is not None # Consulta si existen Cursos asociadas a la Materia
         return exists
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")

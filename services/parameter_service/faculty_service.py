@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from data.faculty_data_base import faculty_by_name, create_faculty, all_faculties, faculty_by_id, delete_faculty, update_faculty, deactivate_faculty
+from data.faculty_data_base import faculty_by_name, create_faculty, get_all_faculties, faculty_by_id, delete_faculty, update_faculty, deactivate_faculty
 from data.career_data_base import check_career_dependencies
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -14,8 +14,8 @@ def faculty_validation(message: str, faculty_name: str, db: Session):
     return faculty_exist
 
 #@ Octener todas las Facultades de la base de datos:
-async def get_all_faculties(db: Session): 
-    return all_faculties(db)
+async def fetch_all_faculties(db: Session): 
+    return get_all_faculties(db)
 
 #$ Crear Nueva Facultad:
 async def create_new_faculty(new_faculty: str, db: Session) -> str:

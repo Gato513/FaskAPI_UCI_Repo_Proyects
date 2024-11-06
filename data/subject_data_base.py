@@ -12,15 +12,16 @@ def get_all(db: Session):
         return subject_data
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #@ Función para obtener una Materia por id:
 def subject_by_id(db: Session, subject_id: int):
     try:
         return db.query(Materia).filter(Materia.id_materia == subject_id).first()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #@ Función para obtener una materias por id:
 def get_by_id(db: Session, subject_id: int):
@@ -28,8 +29,8 @@ def get_by_id(db: Session, subject_id: int):
         return db.query(Materia).filter(Materia.id_materia == subject_id).first()
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #() Función para crear una materia:
 def create_subject(db: Session, subject_name: str, id_course: int):
@@ -40,8 +41,8 @@ def create_subject(db: Session, subject_name: str, id_course: int):
         db.refresh(new_subject)
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #! Función para eliminar Materia:
 def delete_by_id(subject, db: Session):
@@ -49,7 +50,8 @@ def delete_by_id(subject, db: Session):
         db.delete(subject)  # Se pasa la instancia de la materia
         db.commit()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #? Actulizar Materia:
 def update_subject_by_id(subject, subject_name: str, id_course: str, db: Session): 
@@ -58,7 +60,8 @@ def update_subject_by_id(subject, subject_name: str, id_course: str, db: Session
         subject.id_curso = id_course
         db.commit()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos") 
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
 
 #$ Validaciones de Dependencias:
 #% Función para verificar si existen dependencias de cursos para una carrera
@@ -67,4 +70,5 @@ def check_subjects_dependencies(db: Session, course_id: int) -> bool:
         exists = db.query(Materia).filter(Materia.id_curso == course_id).first() is not None # Consulta si existen Cursos asociadas a la Materia
         return exists
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")

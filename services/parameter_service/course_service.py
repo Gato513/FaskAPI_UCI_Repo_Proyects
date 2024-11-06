@@ -1,11 +1,11 @@
-from data.course_data_base import  create_course, get_all, courses_by_faculty, course_by_id, delete_by_id, update_course_by_id
+from data.course_data_base import  create_course, get_all_courses, courses_by_faculty, course_by_id, delete_by_id, update_course_by_id
 from data.subject_data_base import check_subjects_dependencies
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 #@ Octener todas las Cursos de la base de datos:
-async def get_all_courses(db: Session): 
-    return get_all(db)
+async def fetch_all_courses(db: Session): 
+    return get_all_courses(db)
 
 
 #@ Octener todas las Cursos filtrado por facultad:

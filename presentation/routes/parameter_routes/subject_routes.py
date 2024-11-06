@@ -3,13 +3,13 @@ from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
 from services.parameter_service.subject_service import get_all_subject, create_new_subjec, delete_subject_by_id, update_subject
-from services.parameter_service.faculty_service import get_all_faculties
+from services.parameter_service.faculty_service import fetch_all_faculties
 from config.database_config import get_db
 
 
 #@ Renderizar Materias y Cursos
 async def render_subjects_page(request: Request, db: Session, error: str = None):
-    faculties = await get_all_faculties(db)   # Obtener todas las Facultades
+    faculties = await fetch_all_faculties(db)   # Obtener todas las Facultades
     subjects = await get_all_subject(db)     # Obtener todas las materias.
     return templates.TemplateResponse(
         "parameter_management/subjects.html",

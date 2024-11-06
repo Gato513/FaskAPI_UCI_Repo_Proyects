@@ -11,5 +11,5 @@ def user_by_email(db: Session, email: str):
         return user_data
     
     except SQLAlchemyError as e:
-        # Si ocurre algún error relacionado con la base de datos
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error en la base de datos")
+        db.rollback()  # Reversión en caso de fallo
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en la base de datos: {str(e)}")
