@@ -28,11 +28,9 @@ class ProyectosPorMateria(Base):
 class ElementosPorProyecto(Base):
     __tablename__ = 'elementos_por_proyectos'
     id_elem_por_proy = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    elemento_id = Column(Integer, ForeignKey('elementos.id_elemento'), primary_key=True)
-    proyecto_id = Column(Integer, ForeignKey('proyectos.id_proyecto'), primary_key=True)
+    proyecto_id = Column(Integer, ForeignKey('proyectos.id_proyecto'), nullable=False)
     ruta_de_elemento = Column(String(255), nullable=False)
 
-    elemento = relationship("Elemento", back_populates="proyectos_asociados")
     proyecto = relationship("Proyecto", back_populates="elementos_asociados")
 
 
@@ -57,15 +55,6 @@ class PermisoModificacionProyecto(Base):
 
 
 #@ Relaciones Uno a Muchas:
-
-class Elemento(Base):
-    __tablename__ = "elementos"
-    id_elemento = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    descripcion_elemento = Column(Text, nullable=False)
-
-    proyectos_asociados = relationship("ElementosPorProyecto", back_populates="elemento")
-
-
 class PalabrasClave(Base):
     __tablename__ = "palabras_clave"
     id_palabra_clave = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -87,15 +76,15 @@ class Proyecto(Base):
     #$ Relacion mucho a mucho con materias:
     materias_asociadas = relationship("ProyectosPorMateria", back_populates="proyecto")
 
-    #$ Relacion mucho a mucho con elementos:
-    elementos_asociados = relationship("ElementosPorProyecto", back_populates="proyecto")
-
     #$ Usuarios (alumnos) autorizados para modificar el proyecto
     usuarios_autorizados = relationship("PermisoModificacionProyecto", back_populates="proyecto")
 
+    #$ Relación uno a muchos con elementos
+    elementos_asociados = relationship("ElementosPorProyecto", back_populates="proyecto")
+
     id_facultad = Column(Integer, ForeignKey("facultad.id_facultad"), nullable=False)
-    id_carrera = Column(Integer, ForeignKey("carreras.id_carrera"), nullable=False)
-    id_curso = Column(Integer, ForeignKey("cursos.id_curso"), nullable=False)
+    id_carrera  = Column(Integer, ForeignKey("carreras.id_carrera"), nullable=False)
+    id_curso    = Column(Integer, ForeignKey("cursos.id_curso"), nullable=False)
 
     facultad    = relationship("Facultad", back_populates="proyectos") 
     carrera     = relationship("Carrera", back_populates="proyectos")  
