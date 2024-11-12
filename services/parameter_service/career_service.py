@@ -1,4 +1,4 @@
-from data.career_data_base import create_career, get_all, career_by_id, career_by_name, delete_by_id, update_career_by_id
+from data.career_data_base import create_career, get_all_careers, career_by_id, career_by_name, delete_by_id, update_career_by_id
 from data.course_data_base import check_course_dependencies
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -13,8 +13,8 @@ def career_validation(career_name: str, db: Session):
     return career_exist
 
 #@ Octener todas las carreras de la base de datos:
-async def get_all_careers(db: Session): 
-    return get_all(db)
+async def fetch_all_careers(db: Session): 
+    return get_all_careers(db)
 
 #$ Crear Nueva Carrera:
 async def create_new_career(new_career: str, facutie_id: str, db: Session) -> str:

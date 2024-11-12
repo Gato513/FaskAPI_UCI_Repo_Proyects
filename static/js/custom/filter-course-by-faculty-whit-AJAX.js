@@ -14,7 +14,7 @@ const handleFacultySelectorChange = (facultyId, selectorToModify) => {
         redirect: "follow"
     };
 
-    fetch(`http://127.0.0.1:8001/dashboard/parameters/courses_by_faculty/${facultyId}`, requestOptions)
+    fetch(`http://127.0.0.1:8000/dashboard/parameters/courses_by_faculty/${facultyId}`, requestOptions)
         .then((response) => response.json())
         .then((result) => {
 

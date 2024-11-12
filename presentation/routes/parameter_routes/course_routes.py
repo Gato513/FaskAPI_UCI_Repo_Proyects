@@ -3,15 +3,15 @@ from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
 
-from services.parameter_service.course_service import  get_all_courses, create_new_course, delete_course_by_id, get_courses_by_faculty, update_course
-from services.parameter_service.career_service  import  get_all_careers
+from services.parameter_service.course_service import  fetch_all_courses, create_new_course, delete_course_by_id, get_courses_by_faculty, update_course
+from services.parameter_service.career_service  import  fetch_all_careers
 
 from config.database_config import get_db
 
 #@ Renderizar Paginas:
 async def render_course_page(request: Request, db: Session, error: str = None):
-    courses = await get_all_courses(db) # Octener todos los cursos.
-    careers = await get_all_careers(db) # Octener todas las carreras.
+    courses = await fetch_all_courses(db) # Octener todos los cursos.
+    careers = await fetch_all_careers(db) # Octener todas las carreras.
 
     return templates.TemplateResponse(
         "parameter_management/courses.html", 

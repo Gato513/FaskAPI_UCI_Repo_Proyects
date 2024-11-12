@@ -113,7 +113,7 @@ class Usuario(Base):
     user_email = Column(String(50), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
     salt = Column(String(64), nullable=False)
-    role = Column(String(10), nullable=False, default='alumno') # Rol: "Admin", "profesor" y "alumno"
+    role = Column(String(10), nullable=False, default="alumno") # Rol: "Admin", "profesor" y "alumno"
     
     #$ Seccion de Relaciones de los Usuarios:
     # Clave foránea a facultad si es alumno

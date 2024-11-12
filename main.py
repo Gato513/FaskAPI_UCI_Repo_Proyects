@@ -28,3 +28,6 @@ app.include_router(audits_routes.router, prefix="/dashboard/audits")
 @app.get("/")
 async def read_root():
     return RedirectResponse(url="/session/login", status_code=status.HTTP_302_FOUND)
+
+
+#@ hashed_password
