@@ -3,7 +3,7 @@ from starlette.responses import RedirectResponse
 from presentation.routes import session_routes, projects_routes, audits_routes
 from config.server_config import app
 from presentation.routes.parameter_routes import career_routes, course_routes, faculty_routes, subject_routes
-from presentation.routes import users_rutes #! Configuraciones del servidor:
+from presentation.routes import users_rutes 
 
 
 #% Definir Rutas de Sesion:
