@@ -18,7 +18,7 @@ async def user_login(response: Response, request: Request, email: str = Form(...
         response.set_cookie(
             key="access_token", 
             value=f"{token_jwt}",
-            httponly=False,       # HttpOnly para evitar acceso desde el frontend
+            httponly=True,       # HttpOnly para evitar acceso desde el frontend
             secure=False,         # Solo enviar en HTTPS (cambiar a True en producción)
             samesite="Strict",    # Previene envío en solicitudes entre sitios
             max_age=1800          # Tiempo de expiración de la cookie (30 minutos)
