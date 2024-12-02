@@ -1,23 +1,49 @@
 import shutil
 from validation.project_validation import ProjectValidator
 from fastapi import HTTPException, status
+from typing import Optional
 from data.proyect_data_base import (
-    get_all_proyects, 
-    proyect_by_id, add_project_to_db,
+    proyect_by_id, 
+    add_project_to_db,
     match_projects_with_keywords,
     add_keywords_in_database,
     get_all_subjects_by_course,
     get_all_students_by_course,
     associate_subjects,
     associate_documents,
-    associate_students
+    associate_students,
+    delete_project_by_id,
+    delete_relation_by_id,
+    update_project_in_db,
+    get_filtered_projects
 )
-from util.save_uploaded_file import save_uploaded_file, handle_document_path
+
+from util.save_uploaded_file import save_uploaded_file
 from sqlalchemy.orm import Session
 
-#@ Octener todas las carreras de la base de datos:
-async def fetch_proyects(db: Session): 
-    return get_all_proyects(db)
+
+#@ Obtener proyectos filtrados de la base de datos
+async def fetch_proyects(
+    db: Session,
+    nombre_proyecto: Optional[str] = None,
+    facultad: Optional[str] = None,
+    carrera: Optional[str] = None,
+    curso: Optional[str] = None,
+):
+    # Crear un diccionario de filtros basado en los parámetros recibidos
+    filters = {
+        "nombre_proyecto": nombre_proyecto,
+        "facultad": facultad,
+        "carrera": carrera,
+        "curso": curso,
+    }
+
+    # Filtrar valores vacíos o nulos
+    filters = {key: value for key, value in filters.items() if value}
+
+    # Llamar a la función de la capa de datos
+    return get_filtered_projects(db, filters)
+
 
 
 #@ Octener todas las carreras de la base de datos:
@@ -37,10 +63,10 @@ async def fetch_proyect_by_id(id_proyect: str, db: Session):
 async def fetch_all_subjects(id_curso: int, db: Session): 
     return get_all_subjects_by_course(id_curso, db)
 
-
 #@ Octener todos los estudiantes de la base de datos:
 async def fetch_all_students(id_curso: int, db: Session): 
     return get_all_students_by_course(id_curso, db)
+
 
 #$ Crear Nuevo Proyecto:
 async def create_new_project(project_data: dict, db: Session) -> str:
@@ -76,7 +102,6 @@ async def create_new_project(project_data: dict, db: Session) -> str:
         for id_palabra in ids_of_all_keywords:
             match_projects_with_keywords(id_palabra, id_project, db)
 
-
 #$ Crear Asociaciones del Proyecto:
 async def handle_association_aggregation(associated_data: dict, db: Session) -> str:
     try:
@@ -108,3 +133,42 @@ async def handle_association_aggregation(associated_data: dict, db: Session) -> 
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al asociar datos al proyecto: {str(e)}")
+
+
+#% Actualizar un Proyecto:
+async def update_project(project_data: dict, db: Session):
+    try:
+        # Obtener el proyecto existente
+        existing_project = proyect_by_id(db, project_data["id"])
+        if not existing_project:
+            raise HTTPException(status_code=404, detail="El proyecto no existe")
+
+        # Validar los campos principales del proyecto
+        ProjectValidator.validate_nombre_proyecto(project_data["nombre_proyecto"])
+        ProjectValidator.validate_descripcion_proyecto(project_data["descripcion_proyecto"])
+        ProjectValidator.validate_id(project_data["facultad_id"], "ID de la facultad")
+        ProjectValidator.validate_id(project_data["carrera_id"], "ID de la carrera")
+        ProjectValidator.validate_id(project_data["curso_id"], "ID del curso")
+
+        # Actualizar los datos del proyecto en la base de datos
+        updated_project = update_project_in_db(db, project_data["id"], project_data)
+
+        return {"message": "Proyecto actualizado con éxito", "project": updated_project}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar el proyecto: {str(e)}",
+        )
+
+
+#! Eliminar un proyecto y sus Relaciones:
+async def delete_project_service(id_proyecto: int, db: Session):
+    delete_project_by_id(id_proyecto, db)
+    return {"message": f"Proyecto con ID {id_proyecto} eliminado exitosamente"}
+
+#! Eliminar una Relacion:
+async def delete_relation_service(id_relation: int, type_of_relation: str, db: Session):
+    delete_relation_by_id(id_relation, type_of_relation, db)
+
+

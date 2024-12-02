@@ -11,7 +11,10 @@ from services.proyects_service  import(
     create_new_project,
     fetch_all_subjects,
     fetch_all_students,
-    handle_association_aggregation
+    handle_association_aggregation,
+    delete_project_service, 
+    delete_relation_service,
+    update_project
 )
 
 from data.faculty_data_base import get_all_faculties
@@ -21,15 +24,49 @@ from data.proyect_data_base import get_all_keywords
 
 from config.database_config import get_db
 
-#& Renderizar Pagina de Proyectos:
+#& Renderizar Página de Proyectos con Filtros:
 async def render_show_page(request: Request, db: Session, error: str = None):
+    # Obtener parámetros de la solicitud
+    query_params = request.query_params
 
-    proyects = await fetch_proyects(db)  # Obtener todas los pryectos.
+    # Extraer filtros de los parámetros
+    nombre_proyecto = query_params.get("nombre_proyecto", "").strip()
+    facultad = query_params.get("facultad", "").strip()
+    carrera = query_params.get("carrera", "").strip()
+    curso = query_params.get("curso", "").strip()
+
+    # Pasar filtros al servicio para obtener proyectos filtrados
+    proyects = await fetch_proyects(
+        db,
+        nombre_proyecto=nombre_proyecto,
+        facultad=facultad,
+        carrera=carrera,
+        curso=curso,
+    )
+
+    # Obtener listas para los selectores
+    faculties = get_all_faculties(db)
+    careers = get_all_careers(db)
+    courses = get_all_courses(db)
 
     return templates.TemplateResponse(
         "project_management/show_project.html",
-        {"request": request, "proyects": proyects, "error": error}
+        {
+            "request": request,
+            "proyects": proyects,
+            "faculties": faculties,
+            "careers": careers,
+            "courses": courses,
+            "filters": {
+                "nombre_proyecto": nombre_proyecto,
+                "facultad": facultad,
+                "carrera": carrera,
+                "curso": curso,
+            },
+            "error": error,
+        },
     )
+
 
 #& Renderizar Pagina de Detalles
 async def render_detail_page(request: Request, id_proyect: str, db: Session, error: str = None):
@@ -54,10 +91,9 @@ async def render_create_project_page(request: Request, db: Session, error: str =
         {"request": request, "faculties": faculties, "carers": carers, "courses": courses, "keywords": keywords, "error": error}
     )
 
-
-#@ Renderizar Lista de Proyectos:
+#@ Ruta para Mostrar Proyectos con Filtros
 @router.get("/show_project")
-async def show_career(request: Request, db: Session = Depends(get_db)):
+async def show_projects(request: Request, db: Session = Depends(get_db)):
     return await render_show_page(request, db)
 
 #@ Renderizar Detalles de un Proyecto:
@@ -73,16 +109,29 @@ async def show_career(request: Request, id_proyect: str, db: Session = Depends(g
 async def show_create_projects(request: Request, db: Session = Depends(get_db)):
     return await render_create_project_page(request, db)
 
-#@ Renderizar Pagina de Edicion de proyectos:
+#@ Renderizar Página de Edición de Proyectos:
 @router.get("/edit_project/{id_proyect}")
 async def show_projects_edit(request: Request, id_proyect: str, db: Session = Depends(get_db)):
+    try:
+        proyect = await fetch_proyect_by_id(id_proyect, db)
+        faculties = get_all_faculties(db)
+        carers = get_all_careers(db)
+        courses = get_all_courses(db)
+        keywords = get_all_keywords(db)
 
-    proyect = await fetch_proyect_by_id(id_proyect, db)
-
-    return templates.TemplateResponse(
-        "project_management/project_edit.html",
-        {"request": request, "proyect": proyect}
-    )
+        return templates.TemplateResponse(
+            "project_management/project_edit.html",
+            {
+                "request": request,
+                "project": proyect,
+                "faculties": faculties,
+                "carers": carers,
+                "courses": courses,
+                "keywords": keywords,
+            }
+        )
+    except HTTPException as e:
+        return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
 
 #@ Renderizar Pagina de Edicion de Asociaciones del Proyecto:
 @router.get("/show_project_association_page/{id_proyect}")
@@ -147,9 +196,6 @@ async def add_project_association(
     db: Session = Depends(get_db)
 ):
     try:
-
-        
-        
         associated_data = {
             "id_project": id_project,
             "subjects": subjects,
@@ -164,3 +210,71 @@ async def add_project_association(
     except HTTPException as e:
         print(e)
         return RedirectResponse(url=f"/dashboard/projects/add_project_association/{id_project}", status_code=status.HTTP_302_FOUND)
+
+#% Procesar Edición de Proyecto:
+@router.post("/edit_project/{id_proyect}")
+async def edit_project(
+    request: Request,
+    id_proyect: str,
+    nombre_proyecto: str = Form(...),
+    descripcion_proyecto: str = Form(...),
+    facultad_id: str = Form(...),
+    carrera_id: str = Form(...),
+    curso_id: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    try:
+        # Construir los datos del proyecto
+        project_data = {
+            "id": id_proyect,
+            "nombre_proyecto": nombre_proyecto,
+            "descripcion_proyecto": descripcion_proyecto,
+            "facultad_id": facultad_id,
+            "carrera_id": carrera_id,
+            "curso_id": curso_id,
+        }
+
+        # Procesar la actualización del proyecto
+        await update_project(project_data, db)
+
+        # Redirigir al listado de proyectos después de la actualización
+        return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
+
+    except HTTPException as e:
+        # Obtener datos necesarios para renderizar la página en caso de error
+        proyect = await fetch_proyect_by_id(id_proyect, db)
+        faculties = get_all_faculties(db)
+        carers = get_all_careers(db)
+        courses = get_all_courses(db)
+
+        # Renderizar página con datos y error
+        return templates.TemplateResponse(
+            "project_management/project_edit.html",
+            {
+                "request": request,
+                "project": proyect,
+                "faculties": faculties,
+                "carers": carers,
+                "courses": courses,
+                "error": str(e),
+            },
+        )
+
+#! Ruta de eliminacion de proyectos y dependencias;
+@router.get("/delete_proyect/{id_proyecto}")
+async def delete_project(id_proyecto: int, db: Session = Depends(get_db)):
+    try:
+        await delete_project_service(id_proyecto, db)
+        return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
+    except HTTPException as e:
+        raise e
+
+
+#! Ruta de eliminacion una relacion asociada al proyecto;
+@router.get("/delete_relation/{id_proyecto}/{type_of_relation}/{id_relation}")
+async def delete_relation(id_proyecto: int, type_of_relation: str, id_relation: int, db: Session = Depends(get_db)):
+    try:
+        await delete_relation_service(id_relation, type_of_relation, db)
+        return RedirectResponse(url=f"/dashboard/projects/proyect_details/{id_proyecto}", status_code=status.HTTP_302_FOUND)
+    except HTTPException as e:
+        raise e
