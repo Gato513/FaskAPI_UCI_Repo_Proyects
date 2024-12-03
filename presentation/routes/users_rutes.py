@@ -23,6 +23,7 @@ async def show_users_list(
     user: User = Depends(get_current_user)
 ):
     users = get_users_list(db)
+
     if user.role == "admin":
         users = [u for u in users if u.id != user.id and u.role in ["profesor", "alumno"]]
     elif user.role == "profesor":
@@ -30,7 +31,8 @@ async def show_users_list(
     else:
         raise HTTPException(status_code=403, detail="No tiene permisos para ver usuarios")
     
-    print(users)
+    for user in users:
+        user.role = user.role.capitalize()
 
     return templates.TemplateResponse("/user_management/show_users.html", {"request": request, "users": users})
 
@@ -125,23 +127,55 @@ async def edit_user_form(
 
 @router.post("/edit_user/{user_id}")
 async def update_user(
-    request: Request,
     user_id: int,
+    user_name: str = Form(...),
+    user_phone: str = Form(...),
+    user_document: str = Form(...),
+    user_address: str = Form(...),
+    user_matricula: Optional[str] = Form(None),
+    user_email: str = Form(...),
+    password: Optional[str] = Form(None),
+    confirm_password: Optional[str] = Form(None),
+    role: str = Form(...),
+    facultad_id: Optional[int] = Form(None),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
-    **user_data
 ):
+    # Validar permisos
     if user.role not in ["admin", "profesor"]:
         raise HTTPException(status_code=403, detail="No tiene permisos para editar usuarios")
-    
+
+    # Validar existencia del usuario
     editing_user = get_user_by_id(db, user_id)
     if not editing_user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
+
+    # Validar contraseñas (si aplica)
+    if password and confirm_password and password != confirm_password:
+        raise HTTPException(status_code=400, detail="Las contraseñas no coinciden")
+
+    # Preparar datos actualizados
+    user_data = {
+        "user_name": user_name,
+        "user_phone": user_phone,
+        "user_document": user_document,
+        "user_address": user_address,
+        "user_matricula": user_matricula,
+        "user_email": user_email,
+        "role": role,
+        "facultad_id": facultad_id,
+    }
+    if password:
+        user_data["password"] = password
+
+    # Validar y actualizar usuario
     for field, value in user_data.items():
         if value is not None and getattr(editing_user, field) != value:
             check_field_uniqueness(db, field, value, user_id)
+
     update_existing_user(db, user_id, user_data)
+
+    # Redireccionar al listado
     return RedirectResponse(url="/dashboard/users/show_users", status_code=303)
 
 

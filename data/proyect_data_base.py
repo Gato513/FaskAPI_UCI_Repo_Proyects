@@ -69,6 +69,7 @@ def get_filtered_projects(db: Session, filters: dict) -> List[Proyecto]:
 def add_project_to_db(project_data: dict, db: Session) -> int:
     new_project = Proyecto(
         nombre_proyecto=project_data["nombre_proyecto"],
+        portada = project_data["imagen_filename"],
         descripcion_proyecto=project_data["descripcion_proyecto"],
         id_facultad=project_data["facultad_id"],
         id_carrera=project_data["carrera_id"],
