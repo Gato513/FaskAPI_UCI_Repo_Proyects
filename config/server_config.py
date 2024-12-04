@@ -33,7 +33,7 @@ app = FastAPI(lifespan=lifespan)
 Base.metadata.create_all(bind=engine)
 
 # Registrar el middleware para manejar usuarios (por si hace falta usar)
-app.add_middleware(UserMiddleware)
+#@ app.add_middleware(UserMiddleware)
 
 # Configuración de las plantillas Jinja2
 templates = Jinja2Templates(directory="templates")
