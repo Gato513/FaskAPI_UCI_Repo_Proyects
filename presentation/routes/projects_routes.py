@@ -72,13 +72,13 @@ async def render_show_page(request: Request, db: Session, error: str = None):
 
 
 #& Renderizar Pagina de Detalles
-async def render_detail_page(request: Request, id_proyect: str, db: Session, error: str = None):
+async def render_detail_page(request: Request, id_proyect: str, db: Session, error: str = None, user: Usuario = Depends(get_current_user)):
 
     proyecto = await fetch_proyect_by_id(id_proyect, db)
 
     return templates.TemplateResponse(
         "project_management/project_detail.html",
-        {"request": request, "proyecto": proyecto, "error": error}
+        {"request": request, "proyecto": proyecto, "error": error , "role": user}
     )
 
 #& Renderizar Pagina de Creacion de Proyecto:

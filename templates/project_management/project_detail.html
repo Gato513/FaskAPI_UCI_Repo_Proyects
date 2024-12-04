@@ -542,6 +542,7 @@
 
 									<span class="badge bg-primary m-0">{{ clave.palabras_clave.palabras_clave }}</span>
 
+									{% if role.role != "alumno"%}
 									<a class="mb-0 p-0"
 										href="/dashboard/projects/delete_relation/{{ proyecto.id_proyecto }}/keyWord/{{ clave.id_claves }}">
 									
@@ -549,7 +550,8 @@
 											x
 										</button>
 									</a>
-									
+									{% endif %}
+
 								</div>
 
 								{% endfor %}
@@ -580,13 +582,14 @@
 										<p class="m-0"><strong>Fecha de Creación:</strong> {{ date(proyecto.fecha_original_proyecto) }}</p>
 
 										<small class="text-muted">Última Modificación: {{ date(permiso.ultima_modificacion)}}</small>
-										
+										{% if role.role != "alumno"%}
 										<a class="mb-0 p-0 w-25"
 											href="/dashboard/projects/delete_relation/{{ proyecto.id_proyecto }}/permisoModify/{{ permiso.id_permiso_modif }}">
 											<button type="button" class="btn btn-outline-danger mb-0 px-1 w-100">
 												Quitar Permiso
 											</button>
 										</a>
+										{% endif %}
 									</div>
 								</li>
 								{% endfor %}
@@ -614,12 +617,17 @@
 								<li class="list-group-item">
 									<div class="d-flex align-items-center justify-content-between w-100">
 										<p class="m-0 w-45">{{ materia.materia.nombre_materia }}</p>
+
+										{% if role.role != "alumno"%}
 										<a class="mb-0 p-0 w-45"
 											href="/dashboard/projects/delete_relation/{{ proyecto.id_proyecto }}/materia/{{ materia.id_proy_por_mater }}">
 											<button type="button" class="btn btn-outline-danger mb-0 px-1 w-100">
 												Quitar
 											</button>
 										</a>
+										{% endif %}
+
+										
 									</div>
 								</li>
 								{% endfor %}

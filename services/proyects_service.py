@@ -196,12 +196,12 @@ async def delete_project_service(id_proyecto: int, db: Session):
     delete_project_by_id(id_proyecto, db)
     return {"message": f"Proyecto con ID {id_proyecto} eliminado exitosamente"}
 
+#! Eliminar relacion con el proyecto: 
 async def delete_relation_service(id_relation: int, type_of_relation: str, db: Session, user: Usuario):
-    # Llamar a la función de base de datos para eliminar la relación
-    delete_relation_by_id(id_relation, type_of_relation, db)
+
 
     # Solo registrar auditoría si el tipo de relación es "element" (documento) y el usuario es un alumno
-    if type_of_relation == "ELEMENT" and user.role == "alumno":
+    if type_of_relation == "element" and user.role == "alumno":
         # Obtener el documento
         document = db.query(ElementosPorProyecto).filter(ElementosPorProyecto.id_elem_por_proy == id_relation).first()
         if document:
@@ -210,6 +210,9 @@ async def delete_relation_service(id_relation: int, type_of_relation: str, db: S
             if project:
                 descripcion = f"Documento '{document.ruta_de_elemento}' eliminado del proyecto '{project.nombre_proyecto}'."
                 register_audit_entry(db, descripcion, user.id, project.id_proyecto)
+
+    # Llamar a la función de base de datos para eliminar la relación
+    delete_relation_by_id(id_relation, type_of_relation, db)
 
 
 
