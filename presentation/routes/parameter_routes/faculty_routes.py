@@ -4,6 +4,16 @@ from sqlalchemy.orm import Session
 from config.server_config import router, templates
 from services.parameter_service.faculty_service import fetch_all_faculties, create_new_faculty, delete_faculty_by_id, edit_faculty, deactivate_faculty_by_id
 from config.database_config import get_db
+from util.jwt_functions import get_current_user
+
+# Función para verificar que el usuario es administrador
+def verify_admin(user=Depends(get_current_user)):
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para realizar esta acción"
+        )
+    return user
 
 #@ Renderizar Facultades
 async def render_faculties_page(request: Request, db: Session, error: str = None):
@@ -16,12 +26,21 @@ async def render_faculties_page(request: Request, db: Session, error: str = None
 
 #@ Renderizar Facultades:
 @router.get("/faculty")
-async def show_facultades(request: Request, db: Session = Depends(get_db)):
+async def show_facultades(
+    request: Request, 
+    db: Session = Depends(get_db),
+    user=Depends(verify_admin)  # Restringir acceso a administradores
+):
     return await render_faculties_page(request, db)
 
 #( Crear Facultades:
 @router.post("/faculty")
-async def crear_faculty(request: Request, facutie_name: str = Form(...), db: Session = Depends(get_db)):
+async def crear_faculty(
+    request: Request, 
+    facutie_name: str = Form(...), 
+    db: Session = Depends(get_db),
+    user=Depends(verify_admin)  # Restringir acceso a administradores
+):
     try:
         await create_new_faculty(facutie_name, db)
         return await render_faculties_page(request, db)
@@ -30,36 +49,45 @@ async def crear_faculty(request: Request, facutie_name: str = Form(...), db: Ses
 
 #! Eliminar Facultad:
 @router.get("/delete/faculty/{faculty_id}")
-async def delete_faculty(request: Request, faculty_id: int, db: Session = Depends(get_db)):
+async def delete_faculty(
+    request: Request, 
+    faculty_id: int, 
+    db: Session = Depends(get_db),
+    user=Depends(verify_admin)  # Restringir acceso a administradores
+):
     try:
-        # Eliminar la Facultad
         await delete_faculty_by_id(faculty_id, db)
-
-        # Después de eliminar, simplemente renderizas la misma página con los datos actualizados
         return RedirectResponse(url="/dashboard/parameters/faculty", status_code=status.HTTP_302_FOUND)
-    
     except HTTPException as e:
-        # Si hay un error, igual renderizas la página con el mensaje de error
         return await render_faculties_page(request, db, error=e)
 
 #? Actualizar Facultad:
 @router.post("/update/faculty/{faculty_id}")
-async def update_faculty(request: Request, faculty_id: int, facutie_name: str = Form(...), db: Session = Depends(get_db)):
+async def update_faculty(
+    request: Request, 
+    faculty_id: int, 
+    facutie_name: str = Form(...), 
+    db: Session = Depends(get_db),
+    user=Depends(verify_admin)  # Restringir acceso a administradores
+):
     try:
-        # Editar la Facultad
         await edit_faculty(faculty_id, facutie_name, db)
         return RedirectResponse(url="/dashboard/parameters/faculty", status_code=status.HTTP_302_FOUND)
-    
     except HTTPException as e:
-        # Si hay un error, igual renderizas la página con el mensaje de error
         return await render_faculties_page(request, db, error=e)
 
 #% Desactivar Facultad:
 @router.get("/deactivate/faculty/{faculty_id}")
-async def delete_faculty(request: Request, faculty_id: int, db: Session = Depends(get_db)):
+async def deactivate_faculty(
+    request: Request, 
+    faculty_id: int, 
+    db: Session = Depends(get_db),
+    user=Depends(verify_admin)  # Restringir acceso a administradores
+):
     try:
-        # Desactivar la Facultad
         await deactivate_faculty_by_id(faculty_id, db)
         return RedirectResponse(url="/dashboard/parameters/faculty", status_code=status.HTTP_302_FOUND)
     except HTTPException as e:
         return await render_faculties_page(request, db, error=e)
+
+
