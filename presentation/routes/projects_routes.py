@@ -138,7 +138,7 @@ async def show_projects_edit(request: Request, id_proyect: str, db: Session = De
 
 #@ Renderizar Pagina de Edicion de Asociaciones del Proyecto:
 @router.get("/show_project_association_page/{id_proyect}")
-async def show_project_association_page(request: Request, id_proyect: str, db: Session = Depends(get_db)):
+async def show_project_association_page(request: Request, id_proyect: str, db: Session = Depends(get_db), user: Usuario = Depends(get_current_user)):
 
     proyect =  await fetch_proyect_by_id(id_proyect, db)
     id_curso = proyect.id_curso
@@ -148,7 +148,7 @@ async def show_project_association_page(request: Request, id_proyect: str, db: S
 
     return templates.TemplateResponse(
         "project_management/edit_project_association.html",
-        {"request": request, "id_proyect": id_proyect, "subjects": subjects, "students": students}
+        {"request": request, "id_proyect": id_proyect, "subjects": subjects, "students": students, "role": user}
     )
 
 

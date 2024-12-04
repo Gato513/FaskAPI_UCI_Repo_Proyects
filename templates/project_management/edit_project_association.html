@@ -443,6 +443,7 @@
               <!-- Formulario para Asociar Materias, Documentos, y Alumnos -->
               <form action="/dashboard/projects/add_project_association/{{id_proyect}}" method="POST" enctype="multipart/form-data">
                 
+                {% if role.role != "alumno"%}
                 <!-- Asociar Materias -->
                 <div class="mb-4">
                   <h6 class="font-weight-bold">Asociar Materias</h6>
@@ -454,6 +455,7 @@
                   </select>
                   <small class="text-muted">Seleccione las materias relevantes para el proyecto.</small>
                 </div>
+                {% endif %}
 
                 <!-- Asociar Documentos -->
                 <div class="mb-4">
@@ -463,6 +465,7 @@
                   <small class="text-muted">Suba los documentos que desea asociar con el proyecto.</small>
                 </div>
 
+                {% if role.role != "alumno"%}
                 <!-- Asociar Alumnos -->
                 <div class="mb-4">
                   <h6 class="font-weight-bold">Asociar Alumnos</h6>
@@ -475,6 +478,7 @@
                   <small class="text-muted">Seleccione los alumnos que tendrán acceso para modificar el
                     proyecto.</small>
                 </div>
+                {% endif %}
 
                 <!-- Botón de Envío -->
                 <button type="submit" class="btn btn-primary mt-3">Guardar Asociaciones</button>
