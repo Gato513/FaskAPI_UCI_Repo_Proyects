@@ -5,6 +5,7 @@ from fastapi import UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
+from models.all_model import Usuario
 from services.proyects_service  import(
     fetch_proyects,
     fetch_proyect_by_id,
@@ -23,6 +24,7 @@ from data.proyect_data_base import get_all_keywords
 from data.career_data_base  import get_all_careers
 from data.course_data_base  import get_all_courses
 from config.database_config import get_db
+from util.jwt_functions import get_current_user
 
 
 #& Renderizar Página de Proyectos con Filtros:
@@ -195,7 +197,8 @@ async def add_project_association(
     subjects: List[int] = Form([]),  # Lista vacía como valor por defecto
     students: List[int] = Form([]),  # Lista vacía como valor por defecto
     documents: List[UploadFile] = File(None),  
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
 ):
     try:
         associated_data = {
@@ -205,7 +208,7 @@ async def add_project_association(
             "documents": documents,
         }
 
-        await handle_association_aggregation(associated_data, db)
+        await handle_association_aggregation(associated_data, db, user)
 
         return RedirectResponse(url=f"/dashboard/projects/proyect_details/{id_project}", status_code=status.HTTP_302_FOUND)
 
@@ -224,6 +227,7 @@ async def edit_project(
     carrera_id: str = Form(...),
     curso_id: str = Form(...),
     db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
 ):
     try:
         # Construir los datos del proyecto
@@ -236,8 +240,8 @@ async def edit_project(
             "curso_id": curso_id,
         }
 
-        # Procesar la actualización del proyecto
-        await update_project(project_data, db)
+        # Procesar la actualización del proyecto y registrar la auditoría solo si es alumno
+        await update_project(project_data, db, user)
 
         # Redirigir al listado de proyectos después de la actualización
         return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
@@ -262,6 +266,7 @@ async def edit_project(
             },
         )
 
+
 #! Ruta de eliminacion de proyectos y dependencias;
 @router.get("/delete_proyect/{id_proyecto}")
 async def delete_project(id_proyecto: int, db: Session = Depends(get_db)):
@@ -274,9 +279,10 @@ async def delete_project(id_proyecto: int, db: Session = Depends(get_db)):
 
 #! Ruta de eliminacion una relacion asociada al proyecto;
 @router.get("/delete_relation/{id_proyecto}/{type_of_relation}/{id_relation}")
-async def delete_relation(id_proyecto: int, type_of_relation: str, id_relation: int, db: Session = Depends(get_db)):
+async def delete_relation(id_proyecto: int, type_of_relation: str, id_relation: int, db: Session = Depends(get_db), user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
+):
     try:
-        await delete_relation_service(id_relation, type_of_relation, db)
+        await delete_relation_service(id_relation, type_of_relation, db, user)
         return RedirectResponse(url=f"/dashboard/projects/proyect_details/{id_proyecto}", status_code=status.HTTP_302_FOUND)
     except HTTPException as e:
         raise e

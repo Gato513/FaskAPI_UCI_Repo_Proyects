@@ -93,6 +93,8 @@ class Proyecto(Base):
     carrera     = relationship("Carrera", back_populates="proyectos")  
     curso       = relationship("Curso", back_populates="proyectos")    
 
+    # Relación con auditorías
+    auditorias = relationship("Auditoria", back_populates="proyecto")
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -120,6 +122,8 @@ class Usuario(Base):
     # Proyectos que el alumno tiene permiso de modificar
     proyectos_permitidos = relationship("PermisoModificacionProyecto", back_populates="usuario")
 
+    # Relación con auditoría (un usuario puede tener varias auditorías)
+    auditorias = relationship("Auditoria", back_populates="usuario")
 
 class Facultad(Base):
     __tablename__ = "facultad"
@@ -178,3 +182,10 @@ class Auditoria(Base):
     fecha_cambio = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     descripcion_cambio = Column(Text, nullable=False)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    proyecto_id = Column(Integer, ForeignKey("proyectos.id_proyecto"), nullable=False)  
+
+    # Relación con el modelo Usuario
+    usuario = relationship("Usuario", back_populates="auditorias")
+
+    # Relación con el modelo Proyecto
+    proyecto = relationship("Proyecto", back_populates="auditorias")
