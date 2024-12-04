@@ -20,7 +20,7 @@ from data.proyect_data_base import (
     get_filtered_projects
 )
 
-from util.save_uploaded_file import save_uploaded_file
+from util.save_uploaded_file import save_uploaded_file, save_cover_image
 from sqlalchemy.orm import Session
 
 
@@ -45,8 +45,6 @@ async def fetch_proyects(
 
     # Llamar a la función de la capa de datos
     return get_filtered_projects(db, filters)
-
-
 
 #@ Octener todas las carreras de la base de datos:
 async def fetch_proyect_by_id(id_proyect: str, db: Session): 
@@ -82,11 +80,16 @@ async def create_new_project(project_data: dict, db: Session) -> str:
 
     keywords = project_data.pop("palabras_clave")
     new_keyword = project_data.pop("nueva_palabra_clave")
+    document = project_data.pop("document")
 
     there_are_words = ProjectValidator.validate_keywords(keywords, new_keyword)
 
+    #% Escribir la imagen de portada en el servidor:
+    project_data["imagen_filename"] = save_cover_image(document)
+
     # Agregar los datos del proyecto a la BD recuperando su id:
     id_project = add_project_to_db(project_data, db)
+
 
     if there_are_words:
         # Dividir las nuevas palabras clave por comas y limpiar espacios

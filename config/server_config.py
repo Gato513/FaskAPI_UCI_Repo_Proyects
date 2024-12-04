@@ -32,14 +32,12 @@ app = FastAPI(lifespan=lifespan)
 # Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Registrar el middleware para manejar usuarios
-app.add_middleware(UserMiddleware)
-
-# Configura las rutas para archivos estáticos
+#% Configura las rutas para archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configuración de las plantillas Jinja2
 templates = Jinja2Templates(directory="templates")
+
 
 # Definir filtro para formatear fechas y registrarlo en las plantillas
 def format_datetime(value, format="%d/%m/%Y %H:%M"):
@@ -48,13 +46,14 @@ def format_datetime(value, format="%d/%m/%Y %H:%M"):
     return value
 templates.env.globals['date'] = format_datetime
 
+
 # Crear y montar la carpeta de elementos estáticos
 store_dir = os.path.join(os.getcwd(), "store")
+
+#% Comprobar si la carpeta "store" existe, si no, crearla
 if not os.path.exists(store_dir):
     os.makedirs(store_dir)
     print(f"Se ha creado la carpeta: {store_dir}")
+
+#% Montar la carpeta 'store' como un directorio estático
 app.mount("/store", StaticFiles(directory=store_dir), name="store")
-
-# Crear un enrutador si es necesario
-router = APIRouter()
-

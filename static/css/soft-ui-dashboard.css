@@ -8805,6 +8805,10 @@ fieldset:disabled .btn {
   border-color: #fff !important;
 }
 
+.border-shadow-custom{
+  box-shadow: 0px 4px 14px 0px rgba(0,0,0,0.75) !important;
+}
+
 .border-0 {
   border-width: 0 !important;
 }

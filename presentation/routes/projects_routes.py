@@ -1,9 +1,9 @@
-from fastapi import UploadFile, File
-from typing import List, Optional
 from fastapi import Request, Form, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from starlette.responses import RedirectResponse
 from config.server_config import router, templates
+from starlette.responses import RedirectResponse
+from fastapi import UploadFile, File
+from sqlalchemy.orm import Session
+from typing import List, Optional
 
 from models.all_model import Usuario
 from services.proyects_service  import(
@@ -18,13 +18,14 @@ from services.proyects_service  import(
     update_project
 )
 
-from data.faculty_data_base import get_all_faculties
-from data.career_data_base import get_all_careers
-from data.course_data_base import get_all_courses
-from data.proyect_data_base import get_all_keywords
 
+from data.faculty_data_base import get_all_faculties
+from data.proyect_data_base import get_all_keywords
+from data.career_data_base  import get_all_careers
+from data.course_data_base  import get_all_courses
 from config.database_config import get_db
 from util.jwt_functions import get_current_user
+
 
 #& Renderizar Página de Proyectos con Filtros:
 async def render_show_page(request: Request, db: Session, error: str = None):
@@ -151,7 +152,7 @@ async def show_project_association_page(request: Request, id_proyect: str, db: S
     )
 
 
-#$ Funcion para Crear un Nuevo Proyecto:
+#$ Ruta para crear un nuevo proyecto
 @router.post("/create_project")
 async def crear_project(
     request: Request,
@@ -160,32 +161,33 @@ async def crear_project(
     facultad_id: str = Form(...),
     carrera_id: str = Form(...),
     curso_id: str = Form(...),
-    palabras_clave: Optional[List[str]] = Form(None),
+    palabras_clave: List[int] = Form([]),
     nueva_palabra_clave: str = Form(""),
+    document: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
 
-    #$ Asegurarse de que palabras_clave sea una lista vacía si no se proporciona:
-    palabras_clave = palabras_clave or []
+    # Datos del proyecto
+    project_data = {
+        "nombre_proyecto": nombre_proyecto,
+        "descripcion_proyecto": descripcion_proyecto,
+        "facultad_id": facultad_id,
+        "carrera_id": carrera_id,
+        "curso_id": curso_id,
+        "palabras_clave": palabras_clave,
+        "nueva_palabra_clave": nueva_palabra_clave,
+        "document": document
+    }
 
     try:
-        project_data = {
-            "nombre_proyecto": nombre_proyecto,
-            "descripcion_proyecto": descripcion_proyecto,
-            "facultad_id": facultad_id,
-            "carrera_id": carrera_id,
-            "curso_id": curso_id,
-            "palabras_clave": palabras_clave,
-            "nueva_palabra_clave": nueva_palabra_clave,
-        }
-
+        # Crear el proyecto en la base de datos
         await create_new_project(project_data, db)
 
         return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
 
     except HTTPException as e:
-        return await render_create_project_page(request, db, error = e)
-
+        # En caso de error, mostrar la página de creación del proyecto
+        return await render_create_project_page(request, db, error=e)
 
 #$ Funcion para crear asociaciones a un Proyecto:
 @router.post("/add_project_association/{id_project}")
@@ -194,7 +196,7 @@ async def add_project_association(
     id_project: int,
     subjects: List[int] = Form([]),  # Lista vacía como valor por defecto
     students: List[int] = Form([]),  # Lista vacía como valor por defecto
-    documents: List[UploadFile] = File(None),  # None como valor por defecto
+    documents: List[UploadFile] = File(None),  
     db: Session = Depends(get_db)
 ):
     try:

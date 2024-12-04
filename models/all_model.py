@@ -67,6 +67,9 @@ class Proyecto(Base):
     __tablename__ = "proyectos"
     id_proyecto = Column(Integer, primary_key=True, autoincrement=True, index=True)
     nombre_proyecto = Column(String(255), nullable=False)
+
+    portada = Column(String(255), nullable=False)
+
     descripcion_proyecto = Column(Text, nullable=False)
     fecha_original_proyecto = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
