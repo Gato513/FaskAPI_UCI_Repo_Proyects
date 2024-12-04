@@ -1,4 +1,5 @@
 # Capa de Acceso a Datos (Repositorio / Base de Datos)
+from data.audits_data_base import register_audit_entry
 from decorators.db_transaction_manager import DBTransactionManager
 from models.all_model import(
     Proyecto,
@@ -236,9 +237,48 @@ def update_project_in_db(db: Session, project_id: int, project_data: dict):
     try:
         project = db.query(Proyecto).filter(Proyecto.id_proyecto == project_id).first()
         if not project:
-            raise HTTPException(
-                status_code=404, detail="Proyecto no encontrado"
-            )
+            raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+
+        # Actualizar campos básicos del proyecto
+        updatable_fields = [
+            "nombre_proyecto", "descripcion_proyecto", 
+            "id_facultad", "id_carrera", "id_curso"
+        ]
+        
+        for field in updatable_fields:
+            if field in project_data:
+                if field == "id_facultad":
+                    # Aquí aseguramos que estamos actualizando la relación con la facultad
+                    project.id_facultad = project_data[field]
+                elif field == "id_carrera":
+                    # Actualizamos la relación con la carrera
+                    project.id_carrera = project_data[field]
+                elif field == "id_curso":
+                    # Actualizamos la relación con el curso
+                    project.id_curso = project_data[field]
+                else:
+                    setattr(project, field, project_data[field])
+
+        db.commit()
+        db.refresh(project)
+        return project
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar el proyecto: {str(e)}",
+        )
+
+
+
+
+""" @DBTransactionManager.handle_transaction
+def update_project_in_db(db: Session, project_id: int, project_data: dict):
+    try:
+        project = db.query(Proyecto).filter(Proyecto.id_proyecto == project_id).first()
+        if not project:
+            raise HTTPException(status_code=404, detail="Proyecto no encontrado")
 
         # Actualizar campos básicos del proyecto
         updatable_fields = [
@@ -259,3 +299,4 @@ def update_project_in_db(db: Session, project_id: int, project_data: dict):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al actualizar el proyecto: {str(e)}",
         )
+ """

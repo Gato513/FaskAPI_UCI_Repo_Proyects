@@ -1,4 +1,6 @@
 import shutil
+from data.audits_data_base import register_audit_entry
+from models.all_model import Usuario
 from validation.project_validation import ProjectValidator
 from fastapi import HTTPException, status
 from typing import Optional
@@ -136,7 +138,7 @@ async def handle_association_aggregation(associated_data: dict, db: Session) -> 
 
 
 #% Actualizar un Proyecto:
-async def update_project(project_data: dict, db: Session):
+async def update_project(project_data: dict, db: Session, user: Usuario):
     try:
         # Obtener el proyecto existente
         existing_project = proyect_by_id(db, project_data["id"])
@@ -150,10 +152,33 @@ async def update_project(project_data: dict, db: Session):
         ProjectValidator.validate_id(project_data["carrera_id"], "ID de la carrera")
         ProjectValidator.validate_id(project_data["curso_id"], "ID del curso")
 
-        # Actualizar los datos del proyecto en la base de datos
-        updated_project = update_project_in_db(db, project_data["id"], project_data)
+        # Verificar si hubo cambios en alguno de los campos editables
+        cambios = []
+        if existing_project.nombre_proyecto != project_data["nombre_proyecto"]:
+            cambios.append("nombre_proyecto")
+        if existing_project.descripcion_proyecto != project_data["descripcion_proyecto"]:
+            cambios.append("descripcion_proyecto")
+        if existing_project.id_facultad != project_data["facultad_id"]:
+            cambios.append("id_facultad")
+        if existing_project.id_carrera != project_data["carrera_id"]:
+            cambios.append("id_carrera")
+        if existing_project.id_curso != project_data["curso_id"]:
+            cambios.append("id_curso")
 
-        return {"message": "Proyecto actualizado con éxito", "project": updated_project}
+        # Si hubo cambios, actualizar el proyecto y registrar auditoría
+        if cambios:
+            updated_project = update_project_in_db(db, project_data["id"], project_data)
+
+            # Registrar auditoría solo si el usuario es alumno
+            if user.role == "alumno":
+                descripcion = f"El proyecto: '{existing_project.nombre_proyecto}' ha sido modificado."
+                register_audit_entry(db, descripcion, user.id, existing_project.id_proyecto)
+
+            return {"message": "Proyecto actualizado con éxito", "project": updated_project}
+
+        # Si no hubo cambios
+        return {"message": "No se realizaron cambios en el proyecto."}
+
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -161,6 +186,49 @@ async def update_project(project_data: dict, db: Session):
             detail=f"Error al actualizar el proyecto: {str(e)}",
         )
 
+
+
+""" async def update_project(project_data: dict, db: Session, user: Usuario):
+    try:
+        # Obtener el proyecto existente
+        existing_project = proyect_by_id(db, project_data["id"])
+        if not existing_project:
+            raise HTTPException(status_code=404, detail="El proyecto no existe")
+
+        # Validar los campos principales del proyecto
+        ProjectValidator.validate_nombre_proyecto(project_data["nombre_proyecto"])
+        ProjectValidator.validate_descripcion_proyecto(project_data["descripcion_proyecto"])
+        ProjectValidator.validate_id(project_data["facultad_id"], "ID de la facultad")
+        ProjectValidator.validate_id(project_data["carrera_id"], "ID de la carrera")
+        ProjectValidator.validate_id(project_data["curso_id"], "ID del curso")
+
+        # Verificar si hubo cambios en alguno de los campos editables
+        cambios = []
+        for campo in ["nombre_proyecto", "descripcion_proyecto", "facultad_id", "carrera_id", "curso_id"]:
+            if getattr(existing_project, campo) != project_data[campo]:
+                cambios.append(campo)
+
+        # Si hubo cambios, actualizar el proyecto y registrar auditoría
+        if cambios:
+            updated_project = update_project_in_db(db, project_data["id"], project_data)
+
+            # Registrar auditoría solo si el usuario es alumno
+            if user.role == "alumno":
+                descripcion = f"El proyecto: '{existing_project.nombre_proyecto}' ha sido modificado."
+                register_audit_entry(db, descripcion, user.id, existing_project.id_proyecto)
+
+            return {"message": "Proyecto actualizado con éxito", "project": updated_project}
+
+        # Si no hubo cambios
+        return {"message": "No se realizaron cambios en el proyecto."}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar el proyecto: {str(e)}",
+        )
+ """
 
 #! Eliminar un proyecto y sus Relaciones:
 async def delete_project_service(id_proyecto: int, db: Session):

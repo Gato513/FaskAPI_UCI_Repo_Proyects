@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from config.server_config import router, templates
 
+from models.all_model import Usuario
 from services.proyects_service  import(
     fetch_proyects,
     fetch_proyect_by_id,
@@ -23,6 +24,7 @@ from data.course_data_base import get_all_courses
 from data.proyect_data_base import get_all_keywords
 
 from config.database_config import get_db
+from util.jwt_functions import get_current_user
 
 #& Renderizar Página de Proyectos con Filtros:
 async def render_show_page(request: Request, db: Session, error: str = None):
@@ -222,6 +224,7 @@ async def edit_project(
     carrera_id: str = Form(...),
     curso_id: str = Form(...),
     db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
 ):
     try:
         # Construir los datos del proyecto
@@ -234,8 +237,8 @@ async def edit_project(
             "curso_id": curso_id,
         }
 
-        # Procesar la actualización del proyecto
-        await update_project(project_data, db)
+        # Procesar la actualización del proyecto y registrar la auditoría solo si es alumno
+        await update_project(project_data, db, user)
 
         # Redirigir al listado de proyectos después de la actualización
         return RedirectResponse(url="/dashboard/projects/show_project", status_code=status.HTTP_302_FOUND)
@@ -259,6 +262,7 @@ async def edit_project(
                 "error": str(e),
             },
         )
+
 
 #! Ruta de eliminacion de proyectos y dependencias;
 @router.get("/delete_proyect/{id_proyecto}")
