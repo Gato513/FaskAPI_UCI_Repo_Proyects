@@ -141,6 +141,7 @@ async def update_user(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+
     # Validar permisos
     if user.role not in ["admin", "profesor"]:
         raise HTTPException(status_code=403, detail="No tiene permisos para editar usuarios")
@@ -152,7 +153,7 @@ async def update_user(
 
     # Validar contraseñas (si aplica)
     if password and confirm_password and password != confirm_password:
-        raise HTTPException(status_code=400, detail="Las contraseñas no coinciden")
+        raise HTTPException(status_code=400, detail="Las contraseñas no coinsiden")
 
     # Preparar datos actualizados
     user_data = {
@@ -167,11 +168,14 @@ async def update_user(
     }
     if password:
         user_data["password"] = password
+        
 
     # Validar y actualizar usuario
     for field, value in user_data.items():
         if value is not None and getattr(editing_user, field) != value:
             check_field_uniqueness(db, field, value, user_id)
+
+    if confirm_password: user_data["confirm_password"] = confirm_password
 
     update_existing_user(db, user_id, user_data)
 
