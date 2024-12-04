@@ -37,6 +37,7 @@ def register_audit_entry(db: Session, descripcion: str, user_id: int, proyecto_i
         )
         db.add(nueva_auditoria)
         db.commit()
+        db.refresh(nueva_auditoria)  # Esto asegura que la auditoría se ha guardado correctamente
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(

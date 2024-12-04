@@ -271,33 +271,3 @@ def update_project_in_db(db: Session, project_id: int, project_data: dict):
             detail=f"Error al actualizar el proyecto: {str(e)}",
         )
 
-
-
-
-""" @DBTransactionManager.handle_transaction
-def update_project_in_db(db: Session, project_id: int, project_data: dict):
-    try:
-        project = db.query(Proyecto).filter(Proyecto.id_proyecto == project_id).first()
-        if not project:
-            raise HTTPException(status_code=404, detail="Proyecto no encontrado")
-
-        # Actualizar campos básicos del proyecto
-        updatable_fields = [
-            "nombre_proyecto", "descripcion_proyecto", 
-            "id_facultad", "id_carrera", "id_curso"
-        ]
-        for field in updatable_fields:
-            if field in project_data:
-                setattr(project, field, project_data[field])
-
-        db.commit()
-        db.refresh(project)
-        return project
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al actualizar el proyecto: {str(e)}",
-        )
- """

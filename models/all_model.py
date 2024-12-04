@@ -93,6 +93,8 @@ class Proyecto(Base):
     carrera     = relationship("Carrera", back_populates="proyectos")  
     curso       = relationship("Curso", back_populates="proyectos")    
 
+    # Relación con auditorías
+    auditorias = relationship("Auditoria", back_populates="proyecto")
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -184,3 +186,6 @@ class Auditoria(Base):
 
     # Relación con el modelo Usuario
     usuario = relationship("Usuario", back_populates="auditorias")
+
+    # Relación con el modelo Proyecto
+    proyecto = relationship("Proyecto", back_populates="auditorias")

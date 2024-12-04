@@ -197,7 +197,8 @@ async def add_project_association(
     subjects: List[int] = Form([]),  # Lista vacía como valor por defecto
     students: List[int] = Form([]),  # Lista vacía como valor por defecto
     documents: List[UploadFile] = File(None),  
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
 ):
     try:
         associated_data = {
@@ -207,7 +208,7 @@ async def add_project_association(
             "documents": documents,
         }
 
-        await handle_association_aggregation(associated_data, db)
+        await handle_association_aggregation(associated_data, db, user)
 
         return RedirectResponse(url=f"/dashboard/projects/proyect_details/{id_project}", status_code=status.HTTP_302_FOUND)
 
@@ -278,9 +279,10 @@ async def delete_project(id_proyecto: int, db: Session = Depends(get_db)):
 
 #! Ruta de eliminacion una relacion asociada al proyecto;
 @router.get("/delete_relation/{id_proyecto}/{type_of_relation}/{id_relation}")
-async def delete_relation(id_proyecto: int, type_of_relation: str, id_relation: int, db: Session = Depends(get_db)):
+async def delete_relation(id_proyecto: int, type_of_relation: str, id_relation: int, db: Session = Depends(get_db), user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
+):
     try:
-        await delete_relation_service(id_relation, type_of_relation, db)
+        await delete_relation_service(id_relation, type_of_relation, db, user)
         return RedirectResponse(url=f"/dashboard/projects/proyect_details/{id_proyecto}", status_code=status.HTTP_302_FOUND)
     except HTTPException as e:
         raise e
