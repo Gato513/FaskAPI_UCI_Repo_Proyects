@@ -452,28 +452,25 @@
             <div class="d-flex align-items-center justify-content-evenly gap-2" style="min-height: 3.5rem">
     
               <!-- Botón de Crear Proyecto -->
-              <a class="mb-0 p-0 w-20" href="/dashboard/projects/create_project">
+              <a class="mb-0 p-0 w-15" href="/dashboard/projects/create_project">
                 <button type="button" class="btn bg-gradient-info mb-0 px-3 w-100">
-                  Crear Nuevo Proyecto
+                  Nuevo Proyecto
                 </button>
               </a>
     
               <!-- Botón de Proyectos por Carrera -->
-              <a class="mb-0 p-0 w-20" href="/dashboard/projects/projects_by_career">
+              <a class="mb-0 p-0 w-15" href="/dashboard/projects/projects_by_career">
                 <button type="button" class="btn bg-gradient-secondary mb-0 px-3 w-100">
-                  Cantidad Proyectos
+                  Cantidad
                 </button>
               </a>
     
               <!-- Contenedor de Filtros -->
               <form method="get" action="/dashboard/projects/show_project"
-                class="d-flex flex-wrap gap-1 justify-content-evenly align-items-center">
-                <!-- Filtro por Nombre de Proyecto -->
-                <input type="text" class="form-control w-15" name="nombre_proyecto" placeholder="Nombre Proyecto"
-                  value="{{ filters.nombre_proyecto }}" />
+                class="d-flex flex-wrap  justify-content-evenly align-items-center w-70">
     
                 <!-- Filtro por Facultad -->
-                <select class="form-select w-15" name="facultad">
+                <select class="form-select w-20" name="facultad">
                   <option value="">Facultades</option>
                   {% for facultad in faculties %}
                   <option value="{{ facultad.id_facultad }}" {% if filters.facultad==facultad.id_facultad %}selected{% endif
@@ -484,7 +481,7 @@
                 </select>
     
                 <!-- Filtro por Carrera -->
-                <select class="form-select w-15" name="carrera">
+                <select class="form-select w-20" name="carrera">
                   <option value="">Carreras</option>
                   {% for carrera in careers %}
                   <option value="{{ carrera.id_carrera }}" {% if filters.carrera==carrera.id_carrera %}selected{% endif %}>
@@ -494,7 +491,7 @@
                 </select>
     
                 <!-- Filtro por Curso -->
-                <select class="form-select w-15" name="curso">
+                <select class="form-select w-20" name="curso">
                   <option value="">Cursos</option>
                   {% for curso in courses %}
                   <option value="{{ curso.id_curso }}" {% if filters.curso==curso.id_curso %}selected{% endif %}>
@@ -504,7 +501,7 @@
                 </select>
     
                 <!-- Filtro por Extensión -->
-                <select class="form-select w-15" name="is_extension">
+                <select class="form-select w-20" name="is_extension">
                   <option value="">Extensión</option>
                   <option value="si" {% if filters.is_extension=='si' %}selected{% endif %}>Si</option>
                   <option value="no" {% if filters.is_extension=='no' %}selected{% endif %}>No</option>
