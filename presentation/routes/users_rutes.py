@@ -200,8 +200,3 @@ async def delete_user(
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     delete_user_by_id(db, user_id)
     return RedirectResponse(url="/dashboard/users/show_users", status_code=303)
-
-
-@router.get("/profile")
-async def show_profile(request: Request, user: User = Depends(get_current_user)):
-    return templates.TemplateResponse("/profile_management/profile.html", {"request": request, "user": user})

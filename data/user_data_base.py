@@ -133,6 +133,7 @@ def create_admin_user(db: Session):
             password=hashed_password,
             salt=admin_salt,
             role="admin",
+            user_profile_url="default_profile.png"  # <- Valor por defecto
         )
         
         try:

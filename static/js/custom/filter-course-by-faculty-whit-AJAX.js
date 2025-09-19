@@ -4,8 +4,8 @@ const selectCourseCreate = document.querySelector('#select-curso-create');
 const selectFacultyEdit = document.querySelector('#select-faculty-edit');
 const selectCourseEdit = document.querySelector('#select-curso-edit');
 
-selectCourseCreate.innerHTML = '<option selected>Selecione Facultad...</option>';
-selectCourseEdit.innerHTML = '<option selected>Selecione Facultad...</option>';
+selectCourseCreate.innerHTML = '<option selected>Seleccione Facultad...</option>';
+selectCourseEdit.innerHTML = '<option selected>Seleccione Facultad...</option>';
 
 const handleFacultySelectorChange = (facultyId, selectorToModify) => {
 
@@ -14,7 +14,7 @@ const handleFacultySelectorChange = (facultyId, selectorToModify) => {
         redirect: "follow"
     };
 
-    fetch(`http://127.0.0.1:8000/dashboard/parameters/courses_by_faculty/${facultyId}`, requestOptions)
+    fetch(`http://0.0.0.0:8000/dashboard/parameters/courses_by_faculty/${facultyId}`, requestOptions)
         .then((response) => response.json())
         .then((result) => {
 
