@@ -1,9 +1,10 @@
-from fastapi import HTTPException, Request, Depends, Form, status
+from fastapi import HTTPException, Request, Depends, Form
 from starlette.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from config.server_config import router, templates
 from config.database_config import get_db
 from data.user_data_base import check_field_uniqueness, get_user_by_id
+from fastapi import UploadFile, File
 from services.user_service import (
     create_new_user, 
     delete_user_by_id, 
@@ -55,6 +56,7 @@ async def show_users_create(
 @router.post("/create_user")
 async def create_user_route(
     user_name: str = Form(...),
+    document: UploadFile = File(...),
     user_phone: str = Form(...),
     user_document: str = Form(...),
     user_address: str = Form(...),
@@ -72,6 +74,7 @@ async def create_user_route(
     
     user_data = {
         "user_name": user_name,
+        "document": document,
         "user_phone": user_phone,
         "user_document": user_document,
         "user_address": user_address,

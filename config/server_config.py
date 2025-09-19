@@ -1,6 +1,5 @@
 import os
 from fastapi import FastAPI, APIRouter
-from middlewares.user_middleware import UserMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime

@@ -69,6 +69,7 @@ class Proyecto(Base):
     nombre_proyecto = Column(String(255), nullable=False)
 
     portada = Column(String(255), nullable=False)
+    is_extension = Column(String(2), nullable=False)
 
     descripcion_proyecto = Column(Text, nullable=False)
     fecha_original_proyecto = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
@@ -99,6 +100,7 @@ class Proyecto(Base):
 class Usuario(Base):
     __tablename__ = "usuarios"
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_profile_url = Column(String(255), nullable=False, unique=True)
     user_name = Column(String(50), nullable=False, unique=True)
     user_phone = Column(String(20), nullable=False, unique=True)
     user_document = Column(String(20), nullable=False, unique=True)

@@ -32,6 +32,7 @@ async def fetch_proyects(
     facultad: Optional[str] = None,
     carrera: Optional[str] = None,
     curso: Optional[str] = None,
+    is_extension: Optional[str] = None,
 ):
     # Crear un diccionario de filtros basado en los parámetros recibidos
     filters = {
@@ -39,6 +40,7 @@ async def fetch_proyects(
         "facultad": facultad,
         "carrera": carrera,
         "curso": curso,
+        "is_extension": is_extension,
     }
 
     # Filtrar valores vacíos o nulos
@@ -168,6 +170,9 @@ async def update_project(project_data: dict, db: Session, user: Usuario):
             cambios.append("id_carrera")
         if existing_project.id_curso != project_data["curso_id"]:
             cambios.append("id_curso")
+        if existing_project.is_extension != project_data["is_extension"]:
+            cambios.append("is_extension")
+        
 
         # Si hubo cambios, actualizar el proyecto y registrar auditoría
         if cambios:

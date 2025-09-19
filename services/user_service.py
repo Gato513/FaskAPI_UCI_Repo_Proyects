@@ -1,4 +1,3 @@
-from multiprocessing import get_context
 from data.user_data_base import (
     create_user,
     get_user_by_id,
@@ -8,9 +7,13 @@ from data.user_data_base import (
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Request, Depends
 from models.all_model import Usuario
-from util.password_utils import hash_password  # Importar desde util/password_utils
+from util.password_utils import hash_password 
 import secrets
 from typing import List
+
+from util.save_uploaded_file import save_cover_image
+
+
 
 
 # Función para crear un nuevo usuario
@@ -25,12 +28,17 @@ def create_new_user(db: Session, user_data: dict):
 
     # Generar un salt único para el usuario
     salt = secrets.token_hex(32)
+
     # Encriptar la contraseña combinada con el salt
     user_data['password'] = hash_password(user_data['password'], salt)
     user_data['salt'] = salt
 
     # Eliminar confirm_password ya que no se guarda en la base de datos
     user_data.pop('confirm_password')
+    document = user_data.pop("document")
+
+    #% Escribir la imagen de portada en el servidor:
+    user_data["user_profile_url"] = save_cover_image(document)
 
     # Crear el objeto Usuario
     new_user = Usuario(**user_data)

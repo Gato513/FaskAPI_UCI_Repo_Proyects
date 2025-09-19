@@ -468,60 +468,63 @@
   </aside>
 
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg pt-3">
-
+  
+    <!-- Imagen de perfil del usuario -->
+    <div class="d-flex justify-content-center mb-4">
+      <div class="profile-image-wrapper rounded-circle overflow-hidden shadow-lg" style="width: 120px; height: 120px;">
+        <img src="/static/project_covers/{{ user.user_profile_url }}" alt="Perfil del Usuario"
+          class="img-fluid h-100 w-100" style="object-fit: cover;">
+      </div>
+    </div>
+  
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12 mb-md-0 mb-4">
-          <div class="card">
-            <div class="px-0 pb-2">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="card shadow-sm">
+            <div class="card-header bg-gradient-primary text-white text-center py-3">
+              <h5 class="mb-0">Detalles del Usuario</h5>
+            </div>
+            <div class="card-body p-4">
               <div class="table-responsive">
-                <table class="table align-items-center mb-0">
-                  <thead>
+                <table class="table table-hover align-items-center mb-0">
+                  <thead class="bg-light">
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-50">
-                        Campo
-                      </th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 p-4 w-50">
-                        Detalle
-                      </th>
+                      <th class="text-uppercase text-secondary text-xs font-weight-bold opacity-8 p-3">Campo</th>
+                      <th class="text-uppercase text-secondary text-xs font-weight-bold opacity-8 p-3">Detalle</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td class="p-4">Nombre de Usuario</td>
-                      <td class="p-4">{{ user.user_name }}</td>
+                      <td class="p-3">Nombre de Usuario</td>
+                      <td class="p-3">{{ user.user_name }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Teléfono</td>
-                      <td class="p-4">{{ user.user_phone }}</td>
+                      <td class="p-3">Teléfono</td>
+                      <td class="p-3">{{ user.user_phone }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Documento</td>
-                      <td class="p-4">{{ user.user_document }}</td>
+                      <td class="p-3">Documento</td>
+                      <td class="p-3">{{ user.user_document }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Dirección</td>
-                      <td class="p-4">{{ user.user_address }}</td>
+                      <td class="p-3">Dirección</td>
+                      <td class="p-3">{{ user.user_address }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Matrícula</td>
-                      <td class="p-4">{{ user.user_matricula or 'No aplica' }}</td>
+                      <td class="p-3">Matrícula</td>
+                      <td class="p-3">{{ user.user_matricula or 'No aplica' }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Correo Electrónico</td>
-                      <td class="p-4">{{ user.user_email }}</td>
+                      <td class="p-3">Correo Electrónico</td>
+                      <td class="p-3">{{ user.user_email }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Contraseña</td>
-                      <td class="p-4">********</td> <!-- Se oculta la contraseña -->
+                      <td class="p-3">Rol</td>
+                      <td class="p-3">{{ user.role }}</td>
                     </tr>
                     <tr>
-                      <td class="p-4">Rol</td>
-                      <td class="p-4">{{ user.role }}</td>
-                    </tr>
-                    <tr>
-                      <td class="p-4">Facultad</td>
-                      <td class="p-4">{{ user.facultad.nombre_facultad or 'No aplica' }}</td>
+                      <td class="p-3">Facultad</td>
+                      <td class="p-3">{{ user.facultad.nombre_facultad or 'No aplica' }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -531,7 +534,9 @@
         </div>
       </div>
     </div>
+  
   </main>
+
 
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">

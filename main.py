@@ -5,8 +5,6 @@ from config.server_config import app
 from presentation.routes.parameter_routes import career_routes, course_routes, faculty_routes, subject_routes
 from presentation.routes import users_rutes 
 
-
-
 #% Definir Rutas de Sesion:
 app.include_router(session_routes.router, prefix="/session")
 
@@ -30,6 +28,3 @@ app.include_router(audits_routes.router, prefix="/dashboard/audits")
 @app.get("/")
 async def read_root():
     return RedirectResponse(url="/session/login", status_code=status.HTTP_302_FOUND)
-
-
-#@ hashed_password

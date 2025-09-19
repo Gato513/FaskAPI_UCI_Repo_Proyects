@@ -62,9 +62,14 @@ def get_filtered_projects(db: Session, filters: dict) -> List[Proyecto]:
     if "curso" in filters and filters["curso"]:
         query = query.filter(Proyecto.id_curso == filters["curso"])
 
+    if "is_extension" in filters and filters["is_extension"]:
+        query = query.filter(Proyecto.is_extension == filters["is_extension"])
+
+
     return query.all()
 
 
+#?==========================================================================================
 #( Función para crear un proyecto en la base de datos
 @DBTransactionManager.handle_transaction
 def add_project_to_db(project_data: dict, db: Session) -> int:
@@ -74,12 +79,15 @@ def add_project_to_db(project_data: dict, db: Session) -> int:
         descripcion_proyecto=project_data["descripcion_proyecto"],
         id_facultad=project_data["facultad_id"],
         id_carrera=project_data["carrera_id"],
-        id_curso=project_data["curso_id"]
+        id_curso=project_data["curso_id"],
+        is_extension = project_data["is_extension"]
     )
     db.add(new_project)
     db.commit()
     db.refresh(new_project)
     return new_project.id_proyecto
+#?==========================================================================================
+
 
 #( Función para agregar nuevas palabras clave a la BD:
 @DBTransactionManager.handle_transaction
@@ -243,7 +251,7 @@ def update_project_in_db(db: Session, project_id: int, project_data: dict):
         # Actualizar campos básicos del proyecto
         updatable_fields = [
             "nombre_proyecto", "descripcion_proyecto", 
-            "id_facultad", "id_carrera", "id_curso"
+            "id_facultad", "id_carrera", "id_curso", "is_extension"
         ]
         
         for field in updatable_fields:
@@ -257,6 +265,9 @@ def update_project_in_db(db: Session, project_id: int, project_data: dict):
                 elif field == "id_curso":
                     # Actualizamos la relación con el curso
                     project.id_curso = project_data[field]
+                elif field == "is_extension":
+                    # Actualizar extencion:
+                    project.is_extension = project_data[field]
                 else:
                     setattr(project, field, project_data[field])
 

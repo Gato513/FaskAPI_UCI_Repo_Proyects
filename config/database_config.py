@@ -2,9 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# URL de conexión a la base de datos MySQL utilizando el driver pymysql
-# SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root@localhost/serveProyect"
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:AA5606491@localhost/serveProyect"
+# URL de conexión a la base de datos MySQL:
+from config.dot_env_config import SQLALCHEMY_DATABASE_URL
 
 
 # Creación del motor de conexión a la base de datos

@@ -26,6 +26,57 @@ from data.course_data_base  import get_all_courses
 from config.database_config import get_db
 from util.jwt_functions import get_current_user
 
+from models.all_model import Carrera, Proyecto
+
+
+from sqlalchemy import func
+
+# Modificación de render_projects_by_career
+async def render_projects_by_career(request: Request, db: Session, error: str = None):
+    # Obtener parámetros de la solicitud
+    query_params = request.query_params
+
+    # Extraer filtros y orden de los parámetros
+    facultad = query_params.get("facultad", "").strip()
+    order = query_params.get("order", "desc").strip()  # asc o desc
+
+    # Contar la cantidad de proyectos por carrera
+    carrera_counts = (
+        db.query(
+            Carrera.nombre_carrera,
+            func.count(Proyecto.id_proyecto).label("total_proyectos")
+        )
+        .join(Proyecto, Proyecto.id_carrera == Carrera.id_carrera)
+        .filter(Proyecto.id_facultad == facultad if facultad else True)
+        .group_by(Carrera.id_carrera, Carrera.nombre_carrera)
+        .order_by(func.count(Proyecto.id_proyecto).desc() if order == "desc" else func.count(Proyecto.id_proyecto).asc())
+        .all()
+    )
+
+    # Obtener listas para los selectores
+    faculties = get_all_faculties(db)
+
+    return templates.TemplateResponse(
+        "project_management/projects_by_career.html",
+        {
+            "request": request,
+            "carrera_counts": carrera_counts,
+            "faculties": faculties,
+            "filters": {
+                "facultad": facultad,
+                "order": order,
+            },
+            "error": error,
+        },
+    )
+
+# Ruta para proyectos por carrera
+@router.get("/projects_by_career")
+async def projects_by_career(request: Request, db: Session = Depends(get_db)):
+    return await render_projects_by_career(request, db)
+
+
+
 
 #& Renderizar Página de Proyectos con Filtros:
 async def render_show_page(request: Request, db: Session, error: str = None):
@@ -37,6 +88,7 @@ async def render_show_page(request: Request, db: Session, error: str = None):
     facultad = query_params.get("facultad", "").strip()
     carrera = query_params.get("carrera", "").strip()
     curso = query_params.get("curso", "").strip()
+    is_extension = query_params.get("is_extension", "").strip()
 
     # Pasar filtros al servicio para obtener proyectos filtrados
     proyects = await fetch_proyects(
@@ -45,6 +97,7 @@ async def render_show_page(request: Request, db: Session, error: str = None):
         facultad=facultad,
         carrera=carrera,
         curso=curso,
+        is_extension = is_extension,
     )
 
     # Obtener listas para los selectores
@@ -65,6 +118,7 @@ async def render_show_page(request: Request, db: Session, error: str = None):
                 "facultad": facultad,
                 "carrera": carrera,
                 "curso": curso,
+                "is_extension": is_extension,
             },
             "error": error,
         },
@@ -98,6 +152,7 @@ async def render_create_project_page(request: Request, db: Session, error: str =
 @router.get("/show_project")
 async def show_projects(request: Request, db: Session = Depends(get_db)):
     return await render_show_page(request, db)
+
 
 #@ Renderizar Detalles de un Proyecto:
 @router.get("/proyect_details/{id_proyect}")
@@ -163,6 +218,7 @@ async def crear_project(
     curso_id: str = Form(...),
     palabras_clave: List[int] = Form([]),
     nueva_palabra_clave: str = Form(""),
+    is_extension: str =  Form(...),
     document: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
@@ -176,6 +232,7 @@ async def crear_project(
         "curso_id": curso_id,
         "palabras_clave": palabras_clave,
         "nueva_palabra_clave": nueva_palabra_clave,
+        "is_extension": is_extension,
         "document": document
     }
 
@@ -188,6 +245,7 @@ async def crear_project(
     except HTTPException as e:
         # En caso de error, mostrar la página de creación del proyecto
         return await render_create_project_page(request, db, error=e)
+
 
 #$ Funcion para crear asociaciones a un Proyecto:
 @router.post("/add_project_association/{id_project}")
@@ -226,6 +284,7 @@ async def edit_project(
     facultad_id: str = Form(...),
     carrera_id: str = Form(...),
     curso_id: str = Form(...),
+    is_extension: str = Form(...),
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user)  # Obtener el usuario autenticado
 ):
@@ -238,6 +297,7 @@ async def edit_project(
             "facultad_id": facultad_id,
             "carrera_id": carrera_id,
             "curso_id": curso_id,
+            "is_extension": is_extension
         }
 
         # Procesar la actualización del proyecto y registrar la auditoría solo si es alumno
